@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 import org.ogn.commons.beacon.AddressType;
 import org.ogn.commons.beacon.AircraftBeacon;
 import org.ogn.commons.beacon.AircraftType;
+import org.ogn.commons.beacon.OgnBeacon;
 import org.ogn.commons.beacon.impl.OgnBeaconImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -324,6 +325,11 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 		}
 	}
 
+	public AprsAircraftBeacon(Matcher positionMatcher) {
+		super(positionMatcher);
+		this.receiverName = positionMatcher.group("receiver");
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -406,4 +412,22 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 		return true;
 	}
 
+	public OgnBeacon update(Matcher aircraftMatcher) {        
+		int details = Integer.parseInt(aircraftMatcher.group("details"), 16);
+		this.addressType  = AddressType.forValue(details & 0b00000011);
+		this.aircraftType = AircraftType.forValue((details & 0b01111100) >>> 2);
+		this.stealth 	  = ((details & 0b10000000) >>> 7) == 1;
+		
+		this.address = aircraftMatcher.group("id");
+		this.climbRate = aircraftMatcher.group("climbRate") == null ? 0 : feetsToMetres(Float.parseFloat(aircraftMatcher.group("climbRate"))) / 60.0f;
+		this.turnRate = aircraftMatcher.group("turnRate") == null ? 0 : Float.parseFloat(aircraftMatcher.group("turnRate"));
+		this.signalStrength = aircraftMatcher.group("signalQuality") == null ? 0 : Float.parseFloat(aircraftMatcher.group("signalQuality"));
+		this.errorCount = aircraftMatcher.group("errors") == null ? 0 : Integer.parseInt(aircraftMatcher.group("errors"));
+		this.frequencyOffset = aircraftMatcher.group("frequencyOffset") == null ? 0 : Float.parseFloat(aircraftMatcher.group("frequencyOffset"));
+		this.gpsStatus = aircraftMatcher.group("gpsAccuracy") == null ? "" : aircraftMatcher.group("gpsAccuracy");
+		this.firmwareVersion = aircraftMatcher.group("flarmSoftwareVersion") == null ? 0 : Float.parseFloat(aircraftMatcher.group("flarmSoftwareVersion"));
+		this.hardwareVersion = aircraftMatcher.group("flarmHardwareVersion") == null ? 0 : Integer.parseInt(aircraftMatcher.group("flarmHardwareVersion"), 16);
+		this.originalAddress = aircraftMatcher.group("flarmId") == null ? "" : aircraftMatcher.group("flarmId");
+		return this;
+	}
 }

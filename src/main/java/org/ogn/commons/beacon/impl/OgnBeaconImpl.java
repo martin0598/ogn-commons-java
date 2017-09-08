@@ -4,7 +4,13 @@
 
 package org.ogn.commons.beacon.impl;
 
+import static org.ogn.commons.utils.AprsUtils.dmsToDeg;
+import static org.ogn.commons.utils.AprsUtils.feetsToMetres;
+import static org.ogn.commons.utils.AprsUtils.kntToKmh;
+import static org.ogn.commons.utils.AprsUtils.toUtcTimestamp;
+
 import java.io.Serializable;
+import java.util.regex.Matcher;
 
 import org.ogn.commons.beacon.OgnBeacon;
 
@@ -50,6 +56,40 @@ public class OgnBeaconImpl implements OgnBeacon, Serializable {
 		this.groundSpeed = groundSpeed;
 	}
 
+	public OgnBeaconImpl(Matcher matcher) {
+		this.rawPacket = matcher.group(0);
+		
+		// APRS status and position fields
+		this.id = matcher.group("callsign");
+		//this.dstcall = matcher.group("dstcall");
+		//this.srvName = matcher.group("receiver");
+		this.timestamp = toUtcTimestamp(matcher.group("time"));
+		
+		// if we have a APRS status, then we have just 5 groups
+		if (matcher.groupCount() == 5) {
+			return;
+		}
+		
+		// APRS position fields
+		this.lat = matcher.group("latitude") == null ? 0 : dmsToDeg(Double.parseDouble(matcher.group("latitude")));
+		this.lat += matcher.group("posExtension") == null ? 0 : Double.parseDouble(matcher.group("latitudeEnhancement")) / 1000 / 60;
+		if (matcher.group("latitudeSign").equals("S")) {
+			this.lat *= -1;
+		}
+		//matcher.group("symboltable");
+		this.lon = dmsToDeg(Double.parseDouble(matcher.group("longitude")));
+		this.lon += matcher.group("posExtension") == null ? 0 : Double.parseDouble(matcher.group("longitudeEnhancement")) / 1000 / 60;
+		if (matcher.group("longitudeSign").equals("W")) {
+			this.lon *= -1;
+		}
+		//matcher.group("symbol");
+		matcher.group("courseExtension");
+		this.track = matcher.group("course") == null ? 0 : Integer.parseInt(matcher.group("course"));
+		this.groundSpeed = matcher.group("groundSpeed") == null ? 0 : kntToKmh(Float.parseFloat(matcher.group("groundSpeed")));
+		this.alt = matcher.group("altitude") == null ? 0 : feetsToMetres(Float.parseFloat(matcher.group("altitude")));
+		//matcher.group("comment");
+	}
+
 	@Override
 	public String getId() {
 		return id;
@@ -77,7 +117,6 @@ public class OgnBeaconImpl implements OgnBeacon, Serializable {
 
 	@Override
 	public int getTrack() {
-
 		return track;
 	}
 
@@ -142,5 +181,4 @@ public class OgnBeaconImpl implements OgnBeacon, Serializable {
 			return false;
 		return true;
 	}
-
 }

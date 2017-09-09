@@ -25,7 +25,7 @@ public class AircraftBeaconParsing {
         Assert.assertEquals(aircraft_beacon.getAddress(), "DDA5BA");
         Assert.assertEquals(aircraft_beacon.getClimbRate(), feetsToMetres(-454) / 60.0, 0.01);
         Assert.assertEquals(aircraft_beacon.getTurnRate(), -1.1, 0.01);
-        //Assert.assertEquals(aircraft_beacon['signal_quality'], 8.8);
+        Assert.assertEquals(aircraft_beacon.getSignalStrength(), 8.8, 0.01);
         Assert.assertEquals(aircraft_beacon.getErrorCount(), 0);
         Assert.assertEquals(aircraft_beacon.getFrequencyOffset(), 51.2, 0.01);
         Assert.assertEquals(aircraft_beacon.getGpsStatus(), "4x5");
@@ -34,11 +34,10 @@ public class AircraftBeaconParsing {
     @Test
     public void test_hear() {
         AircraftBeacon aircraft_beacon = (AircraftBeacon) parser.parse(validAprs + " id0ADDA5BA -454fpm -1.1rot 8.8dB 0e +51.2kHz gps4x5 hear1084 hearB597 hearB598");
-        String[] proximity = aircraft_beacon.getHeardAircraftIds();
-        Assert.assertEquals(proximity.length, 3);
-        Assert.assertEquals(proximity[0], "1084");
-        Assert.assertEquals(proximity[1], "B597");
-        Assert.assertEquals(proximity[2], "B598");
+        Assert.assertEquals(aircraft_beacon.getHeardAircraftIds().length, 3);
+        Assert.assertEquals(aircraft_beacon.getHeardAircraftIds()[0], "1084");
+        Assert.assertEquals(aircraft_beacon.getHeardAircraftIds()[1], "B597");
+        Assert.assertEquals(aircraft_beacon.getHeardAircraftIds()[2], "B598");
     }
 
     @Test
@@ -63,14 +62,14 @@ public class AircraftBeaconParsing {
     public void test_v024_ogn_tracker() {
     	AircraftBeacon aircraft_beacon = (AircraftBeacon) parser.parse(validAprs + " id07353800 +020fpm -14.0rot FL004.43 38.5dB 0e -2.9kHz");
 
-        //self.assertEqual(aircraft_beacon['flightlevel'], 4.43)
+        Assert.assertEquals(aircraft_beacon.getFlightLevel(), 4.43, 0.01);
     }
 
     @Test
     public void test_v025() {
     	AircraftBeacon aircraft_beacon = (AircraftBeacon) parser.parse(validAprs + " id06DDE28D +535fpm +3.8rot 11.5dB 0e -1.0kHz gps2x3 s6.01 h0C +7.4dBm");
 
-        //self.assertEqual(aircraft_beacon['signal_power'], 7.4)
+        Assert.assertEquals(aircraft_beacon.getERP(), 7.4, 0.01);
     }
 
     @Test

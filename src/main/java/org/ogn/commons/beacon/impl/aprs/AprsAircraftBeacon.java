@@ -436,6 +436,7 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 		this.address = aircraftMatcher.group("id");
 		this.climbRate = aircraftMatcher.group("climbRate") == null ? 0 : feetsToMetres(Float.parseFloat(aircraftMatcher.group("climbRate"))) / 60.0f;
 		this.turnRate = aircraftMatcher.group("turnRate") == null ? 0 : Float.parseFloat(aircraftMatcher.group("turnRate"));
+		this.flightLevel = aircraftMatcher.group("flightLevel") == null ? 0 : Float.parseFloat(aircraftMatcher.group("flightLevel"));
 		this.signalStrength = aircraftMatcher.group("signalQuality") == null ? 0 : Float.parseFloat(aircraftMatcher.group("signalQuality"));
 		this.errorCount = aircraftMatcher.group("errors") == null ? 0 : Integer.parseInt(aircraftMatcher.group("errors"));
 		this.frequencyOffset = aircraftMatcher.group("frequencyOffset") == null ? 0 : Float.parseFloat(aircraftMatcher.group("frequencyOffset"));

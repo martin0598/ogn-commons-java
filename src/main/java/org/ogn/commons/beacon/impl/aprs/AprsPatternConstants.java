@@ -48,5 +48,5 @@ public interface AprsPatternConstants {
 	    "(?:h(?<flarmHardwareVersion>[\\dA-F]{2})\\s?)?" +
 	    "(?:r(?<flarmId>[\\dA-F]+)\\s?)?" +
 	    "(?:(?<signalPower>[+-][\\d.]+)dBm\\s?)?" +
-	    "(?:hear(?<proximity>.+))?";
+	    "(?:(?<proximity>(hear[\\dA-F]{4}\\s?)+))?";
 }

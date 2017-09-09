@@ -10,9 +10,11 @@ import static org.ogn.commons.utils.AprsUtils.kntToKmh;
 import static org.ogn.commons.utils.AprsUtils.toUtcTimestamp;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -428,6 +430,8 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 		this.firmwareVersion = aircraftMatcher.group("flarmSoftwareVersion") == null ? 0 : Float.parseFloat(aircraftMatcher.group("flarmSoftwareVersion"));
 		this.hardwareVersion = aircraftMatcher.group("flarmHardwareVersion") == null ? 0 : Integer.parseInt(aircraftMatcher.group("flarmHardwareVersion"), 16);
 		this.originalAddress = aircraftMatcher.group("flarmId") == null ? "" : aircraftMatcher.group("flarmId");
+		this.erp = aircraftMatcher.group("signalPower") == null ? 0 : Float.parseFloat(aircraftMatcher.group("signalPower"));
+		this.heardAircraftIds = aircraftMatcher.group("proximity") == null ? null : new TreeSet<String>(Arrays.asList(aircraftMatcher.group("proximity").substring(4).split(" hear")));
 		return this;
 	}
 }

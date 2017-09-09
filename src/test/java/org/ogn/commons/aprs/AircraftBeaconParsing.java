@@ -31,13 +31,15 @@ public class AircraftBeaconParsing {
         Assert.assertEquals(aircraft_beacon.getGpsStatus(), "4x5");
     }
 
-    /*@unittest.skip("heared aircrafts not supported yet")
+    @Test
     public void test_hear() {
-        AircraftBeacon aircraft_beacon = (AircraftBeacon) parser.parse("id0ADDA5BA -454fpm -1.1rot 8.8dB 0e +51.2kHz gps4x5 hear1084 hearB597 hearB598");
-        self.assertEqual(len(aircraft_beacon['heared_aircraft_addresses']), 3)
-        self.assertEqual(aircraft_beacon['heared_aircraft_addresses'][0], '1084')
-        self.assertEqual(aircraft_beacon['heared_aircraft_addresses'][1], 'B597')
-        self.assertEqual(aircraft_beacon['heared_aircraft_addresses'][2], 'B598')*/
+        AircraftBeacon aircraft_beacon = (AircraftBeacon) parser.parse(validAprs + " id0ADDA5BA -454fpm -1.1rot 8.8dB 0e +51.2kHz gps4x5 hear1084 hearB597 hearB598");
+        String[] proximity = aircraft_beacon.getHeardAircraftIds();
+        Assert.assertEquals(proximity.length, 3);
+        Assert.assertEquals(proximity[0], "1084");
+        Assert.assertEquals(proximity[1], "B597");
+        Assert.assertEquals(proximity[2], "B598");
+    }
 
     @Test
     public void test_stealth() {

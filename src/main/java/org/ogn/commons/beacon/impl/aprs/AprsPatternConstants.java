@@ -37,11 +37,11 @@ public interface AprsPatternConstants {
 
 	String PATTERN_AIRCRAFT_BEACON = "" +
 	    "id(?<details>\\w{2})(?<id>\\w{6}?)\\s?" +
-	    "(?:(?<climbRate>[+-]\\d+?)fpm\\s)?" +
-	    "(?:(?<turnRate>[+-][\\d.]+?)rot\\s)?" +
-	    "(?:FL(?<flightLevel>[\\d.]+)\\s)?" +
-	    "(?:(?<signalQuality>[\\d.]+?)dB\\s)?" +
-	    "(?:(?<errors>\\d+)e\\s)?" +
+	    "(?:(?<climbRate>[+-]\\d+?)fpm\\s?)?" +
+	    "(?:(?<turnRate>[+-][\\d.]+?)rot\\s?)?" +
+	    "(?:FL(?<flightLevel>[\\d.]+)\\s?)?" +
+	    "(?:(?<signalQuality>[\\d.]+?)dB\\s?)?" +
+	    "(?:(?<errors>\\d+)e\\s?)?" +
 	    "(?:(?<frequencyOffset>[+-][\\d.]+?)kHz\\s?)?" +
 	    "(?:gps(?<gpsAccuracy>\\d+x\\d+)\\s?)?" +
 	    "(?:s(?<flarmSoftwareVersion>[\\d.]+)\\s?)?" +

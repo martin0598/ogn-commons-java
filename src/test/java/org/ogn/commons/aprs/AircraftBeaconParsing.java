@@ -74,8 +74,6 @@ public class AircraftBeaconParsing {
 
     @Test
     public void test_v026() {
-    	AprsLineParser parser = AprsLineParser.get();
-    	
         // from 0.2.6 it is sufficent we have only the ID, climb and turn rate or just the ID
         AircraftBeacon aircraft_beacon_triple = (AircraftBeacon) parser.parse(validAprs + " id093D0930 +000fpm +0.0rot");
         AircraftBeacon aircraft_beacon_single = (AircraftBeacon) parser.parse(validAprs + " id093D0930");

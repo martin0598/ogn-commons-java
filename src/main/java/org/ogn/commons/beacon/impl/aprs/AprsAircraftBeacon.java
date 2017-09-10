@@ -445,7 +445,7 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 		this.hardwareVersion = aircraftMatcher.group("flarmHardwareVersion") == null ? 0 : Integer.parseInt(aircraftMatcher.group("flarmHardwareVersion"), 16);
 		this.originalAddress = aircraftMatcher.group("flarmId") == null ? "" : aircraftMatcher.group("flarmId");
 		this.erp = aircraftMatcher.group("signalPower") == null ? 0 : Float.parseFloat(aircraftMatcher.group("signalPower"));
-		this.heardAircraftIds = aircraftMatcher.group("proximity") == null ? null : new TreeSet<String>(Arrays.asList(aircraftMatcher.group("proximity").substring(4).split(" hear")));
+		this.heardAircraftIds = aircraftMatcher.group("proximity") == null ? new TreeSet<String>() : new TreeSet<String>(Arrays.asList(aircraftMatcher.group("proximity").substring(4).split(" hear")));
 		return this;
 	}
 }

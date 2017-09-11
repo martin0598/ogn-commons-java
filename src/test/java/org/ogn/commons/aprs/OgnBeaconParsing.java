@@ -32,8 +32,8 @@ public class OgnBeaconParsing {
 		Assert.assertEquals(beacon1.getId(), "VITACURA2");
 		Assert.assertEquals(beacon1.getServerName(), "GLIDERN3");
 		Assert.assertEquals(beacon1.getTimestamp(), toUtcTimestamp(4, 21, 36));
-		Assert.assertEquals(beacon1.getLat(), dmsToDeg(3322.81) * -1.0, 0.01);
-		Assert.assertEquals(beacon1.getLon(), dmsToDeg(7034.95) * -1.0, 0.01);
+		Assert.assertEquals(beacon1.getLat(), dmsToDeg(33.2281) * -1.0, 0.01);
+		Assert.assertEquals(beacon1.getLon(), dmsToDeg(70.3495) * -1.0, 0.01);
 		Assert.assertEquals(beacon1.getGroundSpeed(), kntToKmh(0), 0.1);	// default value
 		Assert.assertEquals(beacon1.getAlt(), feetsToMetres(2345), 0.01);
 		Assert.assertEquals(beacon1.getVersion(), "0.2.5");
@@ -57,8 +57,8 @@ public class OgnBeaconParsing {
 		Assert.assertEquals(beacon.getId(), "ZK-GSC");
 		Assert.assertEquals(beacon.getReceiverName(), "Omarama");
 		Assert.assertEquals(beacon.getTimestamp(), toUtcTimestamp(16, 52, 02));
-		Assert.assertEquals(beacon.getLat(), dmsToDeg(4429.25) * -1.0, 0.01);
-		Assert.assertEquals(beacon.getLon(), dmsToDeg(16959.33) *  1.0, 0.01);
+		Assert.assertEquals(beacon.getLat(), dmsToDeg(44.2925) * -1.0, 0.01);
+		Assert.assertEquals(beacon.getLon(), dmsToDeg(169.5933) *  1.0, 0.01);
 		Assert.assertEquals(beacon.getGroundSpeed(), kntToKmh(0), 0.1);	// default value
 		Assert.assertEquals(beacon.getAlt(), feetsToMetres(1407), 0.01);
 		

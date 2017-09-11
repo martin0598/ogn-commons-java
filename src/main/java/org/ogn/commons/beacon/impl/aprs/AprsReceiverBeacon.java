@@ -12,8 +12,6 @@ import static org.ogn.commons.utils.AprsUtils.toUtcTimestamp;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.ogn.commons.beacon.OgnBeacon;
 import org.ogn.commons.beacon.ReceiverBeacon;
@@ -21,6 +19,9 @@ import org.ogn.commons.beacon.impl.OgnBeaconImpl;
 import org.ogn.commons.utils.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.code.regexp.Matcher;
+import com.google.code.regexp.Pattern;
 
 public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon, Serializable {
 

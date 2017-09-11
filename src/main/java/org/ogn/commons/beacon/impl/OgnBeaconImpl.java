@@ -10,9 +10,10 @@ import static org.ogn.commons.utils.AprsUtils.kntToKmh;
 import static org.ogn.commons.utils.AprsUtils.toUtcTimestamp;
 
 import java.io.Serializable;
-import java.util.regex.Matcher;
 
 import org.ogn.commons.beacon.OgnBeacon;
+
+import com.google.code.regexp.Matcher;
 
 /**
  * Generic class representing GPS position fix
@@ -71,13 +72,13 @@ public class OgnBeaconImpl implements OgnBeacon, Serializable {
 		}
 		
 		// APRS position fields
-		this.lat = matcher.group("latitude") == null ? 0 : dmsToDeg(Double.parseDouble(matcher.group("latitude")));
+		this.lat = dmsToDeg(Double.parseDouble(matcher.group("latitude")) / 100);
 		this.lat += matcher.group("posExtension") == null ? 0 : Double.parseDouble(matcher.group("latitudeEnhancement")) / 1000 / 60;
 		if (matcher.group("latitudeSign").equals("S")) {
 			this.lat *= -1;
 		}
 		//matcher.group("symboltable");
-		this.lon = dmsToDeg(Double.parseDouble(matcher.group("longitude")));
+		this.lon = dmsToDeg(Double.parseDouble(matcher.group("longitude")) / 100);
 		this.lon += matcher.group("posExtension") == null ? 0 : Double.parseDouble(matcher.group("longitudeEnhancement")) / 1000 / 60;
 		if (matcher.group("longitudeSign").equals("W")) {
 			this.lon *= -1;

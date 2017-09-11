@@ -15,8 +15,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.ogn.commons.beacon.AddressType;
 import org.ogn.commons.beacon.AircraftBeacon;
@@ -25,6 +23,9 @@ import org.ogn.commons.beacon.OgnBeacon;
 import org.ogn.commons.beacon.impl.OgnBeaconImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.code.regexp.Matcher;
+import com.google.code.regexp.Pattern;
 
 public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon {
 

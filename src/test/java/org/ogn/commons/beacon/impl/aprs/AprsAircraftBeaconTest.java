@@ -159,7 +159,7 @@ public class AprsAircraftBeaconTest {
 		AircraftBeacon b1 = (AircraftBeacon) parser.parse(acBeacon);
 
 		acBeacon = "FLRDD940D>APRS,qAS,LFLE:/075524h4533.44N/00558.73E'000/000/A=000974 !W00! id0ADD940D +020fpm +0.0rot 53.8dB 0e -0.3kHz gps6x8";
-		AircraftBeacon b1 = (AircraftBeacon) parser.parse(acBeacon);
+		AircraftBeacon b2 = (AircraftBeacon) parser.parse(acBeacon);
 
 		assertNotNull(b1);
 		assertNotNull(b2);

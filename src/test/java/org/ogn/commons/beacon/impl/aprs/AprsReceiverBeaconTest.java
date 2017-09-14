@@ -13,13 +13,14 @@ import org.junit.Test;
 import org.ogn.commons.beacon.ReceiverBeacon;
 
 public class AprsReceiverBeaconTest {
+	AprsLineParser parser = AprsLineParser.get();
 
 	@Test
 	public void testEqualsAndHashCode() {
 		String recBeacon = "EBZW>APRS,TCPIP*,qAC,GLIDERN1:/102546h5100.86NI00531.43E&/A=000298 CPU:0.9 RAM:968.2/1056.5MB NTP:1.5ms/-20.0ppm RF:+127-2.9ppm/+4.3dB";
 
-		ReceiverBeacon b1 = new AprsReceiverBeacon(recBeacon);
-		ReceiverBeacon b2 = new AprsReceiverBeacon(recBeacon);
+		ReceiverBeacon b1 = (ReceiverBeacon) parser.parse(recBeacon);
+		ReceiverBeacon b2 = (ReceiverBeacon) parser.parse(recBeacon);
 
 		assertEquals(b1.hashCode(), b2.hashCode());
 		assertEquals(b1, b2);
@@ -30,7 +31,7 @@ public class AprsReceiverBeaconTest {
 	public void test1() {
 		String recBeacon = "EBZW>APRS,TCPIP*,qAC,GLIDERN1:/102546h5100.86NI00531.43E&/A=000298 v1.0.4.ARM CPU:0.9 RAM:968.2/1056.5MB NTP:1.5ms/-20.0ppm RF:+127-2.9ppm/+4.3dB";
 
-		ReceiverBeacon b1 = new AprsReceiverBeacon(recBeacon);
+		ReceiverBeacon b1 = (ReceiverBeacon) parser.parse(recBeacon);
 
 		assertNotNull(b1);
 
@@ -65,7 +66,7 @@ public class AprsReceiverBeaconTest {
 		assertEquals(4.3f, b1.getRecInputNoise(), 1e-2);
 
 		recBeacon = "HHWaard>APRS,TCPIP*,qAC,GLIDERN2:/102540h5240.05NI00450.69E&/A=000020 CPU:1.1 RAM:223.5/458.7MB NTP:0.3ms/-14.8ppm +40.6C RF:+49+4.1ppm/+0.2dB";
-		b1 = new AprsReceiverBeacon(recBeacon);
+		b1 = (ReceiverBeacon) parser.parse(recBeacon);
 		assertEquals(40.6, b1.getCpuTemp(), 1e-2);
 		assertNull(b1.getVersion());
 		assertEquals(0, b1.getNumericVersion());
@@ -73,7 +74,7 @@ public class AprsReceiverBeaconTest {
 
 		// check a version with just noise in the RF
 		recBeacon = "Solothurn>APRS,TCPIP*,qAC,GLIDERN2:/220227h4712.67NI00731.89E&/A=001509 v0.2.2 CPU:0.8 RAM:301.2/456.4MB NTP:0.8ms/-37.7ppm +34.2C RF:+0.99dB";
-		b1 = new AprsReceiverBeacon(recBeacon);
+		b1 = (ReceiverBeacon) parser.parse(recBeacon);
 		assertNotNull(b1);
 		assertEquals(0.0f, b1.getRecAbsCorrection(), 1e-4);
 		assertEquals(0, b1.getRecCrystalCorrection());
@@ -81,14 +82,14 @@ public class AprsReceiverBeaconTest {
 		assertEquals(0.99f, b1.getRecInputNoise(), 1e-4);
 
 		recBeacon = "Gladbck>APRS,TCPIP*,qAC,GLIDERN2:/095759h5133.28NI00659.55E&/A=000154 v0.1.3 CPU:0.1 RAM:287.6/458.6MB NTP:0.3ms/-10.0ppm +40.1C RF:+53+1.0ppm";
-		b1 = new AprsReceiverBeacon(recBeacon);
+		b1 = (ReceiverBeacon) parser.parse(recBeacon);
 		assertNotNull(b1);
 		assertEquals(53, b1.getRecCrystalCorrection());
 		assertEquals(1.0f, b1.getRecCrystalCorrectionFine(), 1e-4);
 		assertEquals(0.0f, b1.getRecInputNoise(), 1e-4);
 
 		recBeacon = "LFLE>APRS,TCPIP*,qAC,GLIDERN1:/203735h4533.44NI00558.59E&020/010/A=000977 v0.2.3.x86 CPU:0.4 RAM:80.9/517.6MB NTP:0.7ms/-25.6ppm RF:+3.80dB";
-		b1 = new AprsReceiverBeacon(recBeacon);
+		b1 = (ReceiverBeacon) parser.parse(recBeacon);
 
 		assertEquals(20, b1.getTrack());
 		assertEquals(18.52, b1.getGroundSpeed(), 1e-4);
@@ -96,7 +97,7 @@ public class AprsReceiverBeaconTest {
 
 		// v.0.2.5 - just to make sure ther's no difference in the 0.2.5 beacon format
 		recBeacon = "Annecy>APRS,TCPIP*,qAC,GLIDERN1:/000024h4552.11NI00612.79E&/A=002132 v0.2.5.ARM CPU:0.6 RAM:651.4/877.1MB NTP:6.5ms/+6.1ppm +34.0C RF:+47-1.9ppm/+1.42dB";
-		b1 = new AprsReceiverBeacon(recBeacon);
+		b1 = (ReceiverBeacon) parser.parse(recBeacon);
 		assertEquals("0.2.5", b1.getVersion());
 	}
 
@@ -104,7 +105,7 @@ public class AprsReceiverBeaconTest {
 	public void test2() {
 		String recBeacon = "incorrect > ! Cdd blah blah blah xxx beacon $$ format";
 
-		ReceiverBeacon b1 = new AprsReceiverBeacon(recBeacon);
+		ReceiverBeacon b1 = (ReceiverBeacon) parser.parse(recBeacon);
 
 		assertEquals(recBeacon, b1.getRawPacket());
 

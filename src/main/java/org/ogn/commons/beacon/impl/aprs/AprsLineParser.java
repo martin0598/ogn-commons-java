@@ -35,8 +35,10 @@ public class AprsLineParser {
 		LOG.trace(aprsLine);
 		OgnBeacon result = null;
 		
-		// Check if we have a APRS status
 		Matcher statusMatcher = aprsStatusPattern.matcher(aprsLine);
+		Matcher positionMatcher = aprsPositionPattern.matcher(aprsLine);
+		
+		// Check if we have a APRS status
 		if (processReceiverBeacons && statusMatcher.matches()) {
 			String comment = statusMatcher.group("comment");
 			Matcher receiverMatcher = ognReceiverPattern.matcher(comment);
@@ -44,11 +46,8 @@ public class AprsLineParser {
 				LOG.debug("Receiver status beacon: {}", aprsLine);
 				result = new AprsReceiverBeacon(statusMatcher).update(receiverMatcher);
 			}
-		}
-
 		// Check if we have a APRS position
-		Matcher positionMatcher = aprsPositionPattern.matcher(aprsLine);
-		if (positionMatcher.matches()) {
+		} else if (positionMatcher.matches()) {
 			String comment = positionMatcher.group("comment");
 			if (processReceiverBeacons && comment == null) {
 				LOG.debug("Receiver position beacon without comment: {}", aprsLine);

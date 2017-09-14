@@ -118,33 +118,6 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 	 */
 	protected float flightLevel = Float.NaN;
 
-	// F-GEKY>APRS,qAS,CHALLES:/145914h4533.12N/00559.93E'140/045/A=003316|H&,+Ll#U"RLz|
-	// F-CLUI>APRS,qAS,TELECOM:/162648h4531.79N/00558.92E'036/056/A=003037
-	// id06DDA310 +495fpm -0.4rot 10.7dB 0e hear9B73
-	// D-4465>APRS,qAS,EDMA:/132350h4825.31N/01055.79E'112/002/A=001512
-	// id06DF03B3 -019fpm +0.0rot 39.0dB 0e -6.7kHz gps1x2 hear0CC5 hearABA7
-
-	// ICA4B4E68>APRS,qAS,Letzi:/152339h4726.50N/00814.20E'260/059/A=002253 !W65! id054B4E68 -395fpm -1.5rot 16.5dB 0e
-	// -14.3kHz gps1x2 s6.05 h43 rDF0CD1 +4.5dBm";
-
-	private static final Pattern basicAprsPattern = Pattern.compile(
-			"(.+?)>APRS,.+,(.+?):/(\\d{6})+h(\\d{4}\\.\\d{2})(N|S).(\\d{5}\\.\\d{2})(E|W).((\\d{3})/(\\d{3}))?/A=(\\d{6}).*?");
-
-	private static final Pattern addressPattern = Pattern.compile("id(\\S{8})");
-	private static final Pattern climbRatePattern = Pattern.compile("(\\+|\\-)(\\d+)fpm");
-	private static final Pattern turnRatePattern = Pattern.compile("(\\+|\\-)(\\d+\\.\\d+)rot");
-	private static final Pattern signalStrengthPattern = Pattern.compile("(\\d+\\.\\d+)dB");
-	private static final Pattern errorCountPattern = Pattern.compile("(\\d+)e");
-	private static final Pattern coordinatesExtensionPattern = Pattern.compile("\\!W(.)(.)!");
-
-	private static final Pattern hearIDPattern = Pattern.compile("hear(\\w{4})");
-	private static final Pattern frequencyOffsetPattern = Pattern.compile("(\\+|\\-)(\\d+\\.\\d+)kHz");
-	private static final Pattern gpsStatusPattern = Pattern.compile("gps(\\d+x\\d+)");
-	private static final Pattern firmwareVersionPattern = Pattern.compile("s(\\d+\\.\\d+)");
-	private static final Pattern hwVersionPattern = Pattern.compile("h([0-9a-fA-F]{2})");
-	private static final Pattern originalAddressPattern = Pattern.compile("r(\\S{6})");
-	private static final Pattern erpPattern = Pattern.compile("(\\+|\\-)(\\d+\\.\\d+)dBm");
-	private static final Pattern flPattern = Pattern.compile("FL(\\d+\\.\\d+)");
 
 	@Override
 	public String getReceiverName() {
@@ -246,99 +219,6 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 	@SuppressWarnings("unused")
 	private AprsAircraftBeacon() {
 		// no default implementation
-	}
-
-	public AprsAircraftBeacon(final String aprsSentence) {
-
-		Matcher matcher;
-
-		List<String> unmachedParams = new ArrayList<>();
-
-		// remember raw packet string
-		rawPacket = aprsSentence;
-
-		String[] aprsParams = aprsSentence.split("\\s+");
-		for (String aprsParam : aprsParams) {
-			if ((matcher = basicAprsPattern.matcher(aprsParam)).matches()) {
-				id = matcher.group(1);
-				receiverName = matcher.group(2);
-				timestamp = toUtcTimestamp(matcher.group(3));
-
-				lat = dmsToDeg(Double.parseDouble(matcher.group(4)) / 100);
-				if (matcher.group(5).equals("S"))
-					lat *= -1;
-				lon = dmsToDeg(Double.parseDouble(matcher.group(6)) / 100);
-				if (matcher.group(7).equals("W"))
-					lon *= -1;
-				if (matcher.group(8) != null) { // track+speed are optional
-					track = Integer.parseInt(matcher.group(9));
-					groundSpeed = kntToKmh(Float.parseFloat(matcher.group(10))); // kts
-																					// to
-																					// km/h
-				}
-				alt = feetsToMetres(Float.parseFloat(matcher.group(11)));
-
-			} else if ((matcher = coordinatesExtensionPattern.matcher(aprsParam)).matches()) {
-				double dlat = Double.parseDouble(matcher.group(1)) / 1000 / 60;
-				double dlon = Double.parseDouble(matcher.group(2)) / 1000 / 60;
-
-				lat += lat > 0 ? dlat : -dlat;
-				lon += lon > 0 ? dlon : -dlon;
-			} else if ((matcher = addressPattern.matcher(aprsParam)).matches()) {
-				address = matcher.group(1).substring(2, 8);
-				// Flarm ID type byte in APRS msg: PTTT TTII
-				// P => stealth mode
-				// TTTTT => aircraftType
-				// II => IdType: 0=Random, 1=ICAO, 2=FLARM, 3=OGN
-				// (see
-				// https://groups.google.com/forum/#!msg/openglidernetwork/lMzl5ZsaCVs/YirmlnkaJOYJ).
-				//
-				addressType = AddressType.forValue(Integer.parseInt(matcher.group(1).substring(0, 2), 16) & 3); // 2
-				aircraftType = AircraftType
-						.forValue((Integer.parseInt(matcher.group(1).substring(0, 2), 16) & 0b1111100) >>> 2);
-				stealth = (Integer.parseInt(matcher.group(1).substring(0, 2), 16) & 0b10000000) != 0;
-			} else if ((matcher = climbRatePattern.matcher(aprsParam)).matches()) {
-				climbRate = feetsToMetres(Float.parseFloat(matcher.group(2))) / 60; // feets/m
-																					// to
-																					// m/s
-				if (matcher.group(1).equals("-"))
-					climbRate *= -1;
-				climbRate = (float) (Math.round(climbRate * 100) / 100.0);
-			} else if ((matcher = turnRatePattern.matcher(aprsParam)).matches()) {
-				turnRate = Float.parseFloat(matcher.group(2));
-				if (matcher.group(1).equals("-"))
-					turnRate *= -1;
-			} else if ((matcher = signalStrengthPattern.matcher(aprsParam)).matches()) {
-				signalStrength = Float.parseFloat(matcher.group(1));
-			} else if ((matcher = errorCountPattern.matcher(aprsParam)).matches()) {
-				errorCount = Integer.parseInt(matcher.group(1));
-			} else if ((matcher = hearIDPattern.matcher(aprsParam)).matches()) {
-				heardAircraftIds.add(matcher.group(1));
-			} else if ((matcher = frequencyOffsetPattern.matcher(aprsParam)).matches()) {
-				frequencyOffset = Float.parseFloat(matcher.group(2));
-				if (matcher.group(1).equals("-"))
-					frequencyOffset *= -1;
-			} else if ((matcher = gpsStatusPattern.matcher(aprsParam)).matches()) {
-				gpsStatus = matcher.group(1);
-			} else if ((matcher = firmwareVersionPattern.matcher(aprsParam)).matches()) {
-				firmwareVersion = Float.parseFloat(matcher.group(1));
-			} else if ((matcher = hwVersionPattern.matcher(aprsParam)).matches()) {
-				hardwareVersion = Integer.parseInt(matcher.group(1), 16);
-			} else if ((matcher = originalAddressPattern.matcher(aprsParam)).matches()) {
-				originalAddress = matcher.group(1);
-			} else if ((matcher = erpPattern.matcher(aprsParam)).matches()) {
-				erp = Float.parseFloat(matcher.group(2));
-			} else if ((matcher = flPattern.matcher(aprsParam)).matches()) {
-				flightLevel = Float.parseFloat(matcher.group(1));
-			} else {
-
-				unmachedParams.add(aprsParam);
-			}
-		}
-
-		if (!unmachedParams.isEmpty()) {
-			LOG.warn("aprs-sentence:[{}] unmatched aprs parms: {}", aprsSentence, unmachedParams);
-		}
 	}
 
 	public AprsAircraftBeacon(Matcher positionMatcher) {

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2015 OGN, All Rights Reserved.
+ * Copyright (c) 2014-2017 OGN, All Rights Reserved.
  */
 
 package org.ogn.commons.beacon.impl.aprs;
@@ -7,7 +7,6 @@ package org.ogn.commons.beacon.impl.aprs;
 import org.ogn.commons.beacon.OgnBeacon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.google.code.regexp.Matcher;
 import com.google.code.regexp.Pattern;
 
@@ -63,6 +62,7 @@ public class AprsLineParser {
 				if (processReceiverBeacons && receiverMatcher.matches()) {
 					LOG.debug("Receiver position beacon: {}", aprsLine);
 					result = new AprsReceiverBeacon(positionMatcher).update(receiverMatcher);
+
 				}
 			}
 		}

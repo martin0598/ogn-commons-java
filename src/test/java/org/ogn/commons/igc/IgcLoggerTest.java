@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 OGN, All Rights Reserved.
+ * Copyright (c) 2014-2017 OGN, All Rights Reserved.
  */
 
 package org.ogn.commons.igc;
@@ -15,10 +15,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Optional;
 import java.util.TimeZone;
 
 import org.junit.After;
@@ -65,7 +67,9 @@ public class IgcLoggerTest {
 		files.clear();
 
 		// delete log folder if it exists
-		Path dir = Paths.get("log/" + date);
+		// Path dir = Paths.get("log/" + date);
+
+		Path dir = Paths.get("log/");
 		if (Files.exists(dir)) {
 			Files.walkFileTree(dir, new SimpleFileVisitor<Path>() {
 				@Override
@@ -94,7 +98,7 @@ public class IgcLoggerTest {
 			logger.log(beacon, descriptors[i++]);
 		}
 
-		commonVerification();
+		commonVerification(date.toString());
 	}
 
 	@Test
@@ -108,12 +112,12 @@ public class IgcLoggerTest {
 		}
 
 		// wait a bit..
-		Thread.sleep(600);
+		Thread.sleep(1000);
 
-		commonVerification();
+		commonVerification(date);
 	}
 
-	private void commonVerification() throws Exception {
+	private void commonVerification(String date) throws Exception {
 		// make sure files were created
 		// delete log folder if it exists
 		Path dir = Paths.get("log/" + date);

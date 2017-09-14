@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 OGN, All Rights Reserved.
+ * Copyright (c) 2014-2017 OGN, All Rights Reserved.
  */
 
 package org.ogn.commons.beacon.impl.aprs;
@@ -206,11 +206,8 @@ public class AprsAircraftBeaconTest {
 	@Test
 	public void testFlghtLevelInBeacon() {
 		String acBeacon = "OGN37413F>APRS,qAS,LKMO:/092623h5031.47N/01340.79E'000/000/A=001105 !W39! id0737413F +040fpm +0.0rot FL009.12 31.8dB 0e -2.1kHz";
-
 		AircraftBeacon b1 = (AircraftBeacon) parser.parse(acBeacon);
-
 		assertNotNull(b1);
-
 		assertEquals(9.12f, b1.getFlightLevel(), 0.01f);
 	}
 

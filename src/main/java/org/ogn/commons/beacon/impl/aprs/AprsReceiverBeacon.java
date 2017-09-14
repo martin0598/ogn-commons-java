@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2015 OGN, All Rights Reserved.
+ * Copyright (c) 2014-2017 OGN, All Rights Reserved.
  */
 
 package org.ogn.commons.beacon.impl.aprs;
@@ -98,19 +98,19 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
 	// v0.2.3.x86 CPU:0.4 RAM:80.9/517.6MB NTP:0.7ms/-25.6ppm RF:+3.80dB";
 
 	private static final Pattern basicAprsPattern = Pattern
-			.compile("(.+?)>APRS,.+,(.+?):/(\\d{6})+h(\\d{4}\\.\\d{2})(N|S).(\\d{5}\\.\\d{2})(E|W).((\\d{3})/(\\d{3}))?/A=(\\d{6}).*?");
+			.compile("(.+?)>APRS,.+,(.+?):[/>](\\d{6})+h(\\d{4}\\.\\d{2})(N|S).(\\d{5}\\.\\d{2})(E|W).((\\d{3})/(\\d{3}))?/A=(\\d{6}).*?");
 
 	private static final Pattern versionPattern = Pattern.compile("v(\\d+\\.\\d+\\.\\d+)\\.?(.*?)");
 
 	private static final Pattern cpuPattern = Pattern.compile("CPU:(\\d+\\.\\d+)");
-	private static final Pattern cpuTempPattern = Pattern.compile("(\\+|\\-)(\\d+\\.\\d+)C");
+	private static final Pattern cpuTempPattern = Pattern.compile("([+-]\\d+\\.\\d+)C");
 	private static final Pattern ramPattern = Pattern.compile("RAM:(\\d+\\.\\d+)/(\\d+\\.\\d+)MB");
 	private static final Pattern ntpPattern = Pattern.compile("NTP:(\\d+\\.\\d+)ms/(\\+|\\-)(\\d+\\.\\d+)ppm");
 
 	private static final Pattern rfPatternFull = Pattern
 			.compile("RF:(\\+|\\-)(\\d+)(\\+|\\-)(\\d+\\.\\d+)ppm/(\\+|\\-)(\\d+\\.\\d+)dB");
 
-	private static final Pattern rfPatternLight1 = Pattern.compile("RF:(\\+|\\-)(\\d+\\.\\d+)dB");
+	private static final Pattern rfPatternLight1 = Pattern.compile("RF:([+-]\\d+\\.\\d+)dB");
 
 	private static final Pattern rfPatternLight2 = Pattern.compile("RF:(\\+|\\-)(\\d+)(\\+|\\-)(\\d+\\.\\d+)ppm");
 
@@ -198,6 +198,7 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
 	public AprsReceiverBeacon(Matcher matcher) {
 		super(matcher);
 		this.srvName = matcher.group("receiver");
+
 	}
 
 	@Override

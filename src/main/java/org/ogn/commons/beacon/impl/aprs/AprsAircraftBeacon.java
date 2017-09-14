@@ -118,7 +118,6 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 	 */
 	protected float flightLevel = Float.NaN;
 
-
 	@Override
 	public String getReceiverName() {
 		return receiverName;

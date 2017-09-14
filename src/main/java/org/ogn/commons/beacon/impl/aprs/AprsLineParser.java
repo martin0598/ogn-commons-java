@@ -1,20 +1,43 @@
 /**
- * Copyright (c) 2014-2017 OGN, All Rights Reserved.
+ * Copyright (c) 2014-2015 OGN, All Rights Reserved.
  */
 
 package org.ogn.commons.beacon.impl.aprs;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.ogn.commons.beacon.OgnBeacon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.google.code.regexp.Matcher;
-import com.google.code.regexp.Pattern;
 
 public class AprsLineParser {
-	private static Pattern aprsPositionPattern = Pattern.compile(AprsPatternConstants.PATTERN_APRS_POSITION, Pattern.MULTILINE);
-	private static Pattern aprsStatusPattern = Pattern.compile(AprsPatternConstants.PATTERN_APRS_STATUS, Pattern.MULTILINE);
-	private static Pattern ognAircraftPattern = Pattern.compile(AprsPatternConstants.PATTERN_AIRCRAFT_BEACON);
-	private static Pattern ognReceiverPattern = Pattern.compile(AprsPatternConstants.PATTERN_RECEIVER_BEACON);
+
+	// public static final String APRS_SENTENCE_PATTERN =
+	// "(.+)>.+:[/|>]\\d+h(\\d{4}\\.\\d{2})(N|S)(.)(\\d{5}\\.\\d{2})(E|W)(.)((\\d{3})/(\\d{3}))?/A=(\\d{6}).*";
+	public static final String APRS_SENTENCE_PATTERN = "(.+)>.+:[/>].*";
+
+	// private static final String ID_PATTERN = "id(\\S{8})";
+	// public static final String RECEIVER_BEACON_PATTER = "(.+)>.+:[/>].(^id*";
+
+	public static final String RECEIVER_BEACON_PATTER = "(.+)>.+:[/>].*";
+	// public static final String METRICS_BEACON_RECEIVER_PATTER = "(.+)>.+:>.*";
+
+	// OGN APRS servers reply to the client or send periodic heart-bit where
+	// first character is #
+	// e.g:
+	// # aprsc 2.0.14-g28c5a6a
+	// # logresp PCBE13-1 unverified, server GLIDERN2
+	private static final String APRS_SRV_MSG_FIRST_CHARACTER = "#";
+
+	private static Pattern aprsSentencePattern = Pattern.compile(APRS_SENTENCE_PATTERN);
+
+	// private static Pattern recPossBeaconPattern = Pattern.compile(RECEIVER_BEACON_PATTER);
+
+	private static Pattern rfPattern = Pattern
+			.compile("(.)+ RF:(\\+|\\-)(\\d+)(\\+|\\-)(\\d+\\.\\d+)ppm/(\\+|\\-)(\\d+\\.\\d+)dB.*");
+
+	private static Pattern cpuPattern = Pattern.compile("(.)+ CPU:(\\d+\\.\\d+).*");
 
 	private static Logger LOG = LoggerFactory.getLogger(AprsLineParser.class);
 
@@ -33,38 +56,36 @@ public class AprsLineParser {
 	public OgnBeacon parse(String aprsLine, boolean processAircraftBeacons, boolean processReceiverBeacons) {
 		LOG.trace(aprsLine);
 		OgnBeacon result = null;
-		
-		Matcher statusMatcher = aprsStatusPattern.matcher(aprsLine);
-		Matcher positionMatcher = aprsPositionPattern.matcher(aprsLine);
-		
-		// Check if we have a APRS status
-		if (processReceiverBeacons && statusMatcher.matches()) {
-			String comment = statusMatcher.group("comment");
-			Matcher receiverMatcher = ognReceiverPattern.matcher(comment);
-			if (receiverMatcher.matches()) {
-				LOG.debug("Receiver status beacon: {}", aprsLine);
-				result = new AprsReceiverBeacon(statusMatcher).update(receiverMatcher);
-			}
-		// Check if we have a APRS position
-		} else if (positionMatcher.matches()) {
-			String comment = positionMatcher.group("comment");
-			if (processReceiverBeacons && comment == null) {
-				LOG.debug("Receiver position beacon without comment: {}", aprsLine);
-				result = new AprsReceiverBeacon(positionMatcher);
-			} else {
-				Matcher aircraftMatcher = ognAircraftPattern.matcher(comment);
-				if (processAircraftBeacons && aircraftMatcher.matches()) {
-					LOG.debug("Aircraft position beacon: {}", aprsLine);
-					result = new AprsAircraftBeacon(positionMatcher).update(aircraftMatcher);
-				}
-				
-				Matcher receiverMatcher = ognReceiverPattern.matcher(comment);
-				if (processReceiverBeacons && receiverMatcher.matches()) {
-					LOG.debug("Receiver position beacon: {}", aprsLine);
-					result = new AprsReceiverBeacon(positionMatcher).update(receiverMatcher);
+
+		Matcher m1 = aprsSentencePattern.matcher(aprsLine); // Try to match
+
+		if (m1.matches()) {
+			if (!aprsLine.startsWith(APRS_SRV_MSG_FIRST_CHARACTER)) {
+
+				// TODO: fix to support beacons as of v.0.2.6
+
+				// receiver beacons are supposed to have RF and/or CPU information
+				// if (recPossBeaconPattern.matcher(aprsLine).matches() || (rfPattern.matcher(aprsLine).matches() &&
+				// cpuPattern.matcher(aprsLine).matches()) ) {
+				if ((rfPattern.matcher(aprsLine).matches() || cpuPattern.matcher(aprsLine).matches())) {
+
+					if (processReceiverBeacons) {
+
+						// match receiver beacons
+						LOG.debug("Receiver beacon: {}", aprsLine);
+						result = new AprsReceiverBeacon(aprsLine);
+					}
+
+				} else {
+					if (processAircraftBeacons) {
+						// match aircraft beacons
+						LOG.debug("Aircraft beacon: {}", aprsLine);
+						result = new AprsAircraftBeacon(aprsLine);
+					}
 
 				}
 			}
+
 		}
 
 		return result;

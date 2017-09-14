@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2017 OGN, All Rights Reserved.
+ * Copyright (c) 2014 OGN, All Rights Reserved.
  */
 
 package org.ogn.commons.beacon.impl.aprs;
@@ -23,14 +23,13 @@ import org.ogn.commons.utils.AprsUtils;
 import org.ogn.commons.utils.JsonUtils;
 
 public class AprsAircraftBeaconTest {
-	AprsLineParser parser = AprsLineParser.get();
 
 	@Test
 	public void testEqualsAndHashCode() {
 		String acBeacon = "PH-844>APRS,qAS,Veendam:/102529h5244.42N/00632.07E'089/077/A=000876 id06DD82AC -474fpm +0.1rot 7.8dB 1e +0.7kHz gps2x3 hear8222";
 
-		AircraftBeacon b1 = (AircraftBeacon) parser.parse(acBeacon);
-		AircraftBeacon b2 = (AircraftBeacon) parser.parse(acBeacon);
+		AircraftBeacon b1 = new AprsAircraftBeacon(acBeacon);
+		AircraftBeacon b2 = new AprsAircraftBeacon(acBeacon);
 
 		assertEquals(b1.hashCode(), b2.hashCode());
 		assertEquals(b1, b2);
@@ -41,7 +40,7 @@ public class AprsAircraftBeaconTest {
 	public void test1() {
 		String acBeacon = "PH-844>APRS,qAS,Veendam:/102529h5244.42N/00632.07E'089/077/A=000876 id06DD82AC -474fpm +0.1rot 7.8dB 1e +0.7kHz gps2x3 hear8222 hear8223 hear8224";
 
-		AircraftBeacon b1 = (AircraftBeacon) parser.parse(acBeacon);
+		AircraftBeacon b1 = new AprsAircraftBeacon(acBeacon);
 
 		assertNotNull(b1);
 
@@ -82,7 +81,7 @@ public class AprsAircraftBeaconTest {
 	public void test2() {
 		String acBeacon = "incorrect > ! Cdd blah blah blah xxx beacon $$ format";
 
-		AircraftBeacon b1 = (AircraftBeacon) parser.parse(acBeacon);
+		AircraftBeacon b1 = new AprsAircraftBeacon(acBeacon);
 
 		assertEquals(acBeacon, b1.getRawPacket());
 
@@ -95,7 +94,7 @@ public class AprsAircraftBeaconTest {
 	public void test3() {
 		String acBeacon = "PH-1345>APRS,qAS,LFGP:/133244h4758.48N/00346.17E'274/028/A=001138 id06DD8652 -019fpm -10.6rot 18.8dB 0e -2.5kHz gps5x11 hear8E05 hear8F0F hearAA4A";
 
-		AircraftBeacon b1 = (AircraftBeacon) parser.parse(acBeacon);
+		AircraftBeacon b1 = new AprsAircraftBeacon(acBeacon);
 
 		assertEquals(-10.6f, b1.getTurnRate(), 0.0f);
 	}
@@ -107,7 +106,7 @@ public class AprsAircraftBeaconTest {
 		// available)
 		String acBeacon = "PH-1345>APRS,qAS,LFGP:/133244h4758.48N/00346.17E'274/028/A=001138 id06DD8652 -019fpm -10.6rot 18.8dB 0e -2.5kHz hear8E05 hear8F0F hearAA4A";
 
-		AircraftBeacon b1 = (AircraftBeacon) parser.parse(acBeacon);
+		AircraftBeacon b1 = new AprsAircraftBeacon(acBeacon);
 
 		assertNull(b1.getGpsStatus());
 		System.out.println(JsonUtils.toJson(b1));
@@ -118,7 +117,7 @@ public class AprsAircraftBeaconTest {
 		// test against incorrect beacon format
 
 		String acBeacon = "F-PVVA>APRS,qAS,CHALLES:/130435h4534.95N/00559.83E'237/105/A=002818|$#*IL<&z#XLx|";
-		AircraftBeacon b1 = (AircraftBeacon) parser.parse(acBeacon);
+		AircraftBeacon b1 = new AprsAircraftBeacon(acBeacon);
 
 		assertNotNull(b1);
 		System.out.println(JsonUtils.toJson(b1));
@@ -130,7 +129,7 @@ public class AprsAircraftBeaconTest {
 	public void test6() {
 
 		String acBeacon = "FLRDDEAAB>APRS,qAS,Hornberg:/153509h4844.83N/00951.62E'301/001/A=002365 id06DDEAAB +020fpm -0.7rot 53.2dB 0e +0.7kHz gps3x5";
-		AircraftBeacon b1 = (AircraftBeacon) parser.parse(acBeacon);
+		AircraftBeacon b1 = new AprsAircraftBeacon(acBeacon);
 
 		assertNotNull(b1);
 
@@ -145,7 +144,7 @@ public class AprsAircraftBeaconTest {
 	public void test7() {
 
 		String acBeacon = "FLRDDEAAB>APRS,qAS,Hornberg:/153^^509h4844.83N/00951.62E'301/001/A=002365 33sss3 XX!~@SS id06DDEAAB +020fpm -0.7rot 53.2dB 0e +0.7kHz gps3x5";
-		AircraftBeacon b1 = (AircraftBeacon) parser.parse(acBeacon);
+		AircraftBeacon b1 = new AprsAircraftBeacon(acBeacon);
 
 		assertNotNull(b1);
 		assertEquals(acBeacon, b1.getRawPacket());
@@ -156,10 +155,10 @@ public class AprsAircraftBeaconTest {
 
 		// test the extended format of APRS packet (additional lat/lon digits)
 		String acBeacon = "FLRDD940D>APRS,qAS,LFLE:/075524h4533.44N/00558.73E'000/000/A=000974 !W61! id0ADD940D +020fpm +0.0rot 53.8dB 0e -0.3kHz gps6x8";
-		AircraftBeacon b1 = (AircraftBeacon) parser.parse(acBeacon);
+		AircraftBeacon b1 = new AprsAircraftBeacon(acBeacon);
 
 		acBeacon = "FLRDD940D>APRS,qAS,LFLE:/075524h4533.44N/00558.73E'000/000/A=000974 !W00! id0ADD940D +020fpm +0.0rot 53.8dB 0e -0.3kHz gps6x8";
-		AircraftBeacon b2 = (AircraftBeacon) parser.parse(acBeacon);
+		AircraftBeacon b2 = new AprsAircraftBeacon(acBeacon);
 
 		assertNotNull(b1);
 		assertNotNull(b2);
@@ -172,7 +171,7 @@ public class AprsAircraftBeaconTest {
 	// test parsing of new fields in beacon as from v. 0.2.5
 	public void test9() {
 		String acBeacon = "ICA4B4E68>APRS,qAS,Letzi:/152339h4726.50N/00814.20E'260/059/A=002253 !W65! id054B4E68 -395fpm -1.5rot 16.5dB 0e -14.3kHz gps1x2 s6.05 h4C rDF0CD1 +4.5dBm";
-		AircraftBeacon b1 = (AircraftBeacon) parser.parse(acBeacon);
+		AircraftBeacon b1 = new AprsAircraftBeacon(acBeacon);
 
 		assertNotNull(b1);
 
@@ -206,8 +205,11 @@ public class AprsAircraftBeaconTest {
 	@Test
 	public void testFlghtLevelInBeacon() {
 		String acBeacon = "OGN37413F>APRS,qAS,LKMO:/092623h5031.47N/01340.79E'000/000/A=001105 !W39! id0737413F +040fpm +0.0rot FL009.12 31.8dB 0e -2.1kHz";
-		AircraftBeacon b1 = (AircraftBeacon) parser.parse(acBeacon);
+
+		AircraftBeacon b1 = new AprsAircraftBeacon(acBeacon);
+
 		assertNotNull(b1);
+
 		assertEquals(9.12f, b1.getFlightLevel(), 0.01f);
 	}
 

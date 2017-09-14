@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2017 OGN, All Rights Reserved.
+ * Copyright (c) 2014-2015 OGN, All Rights Reserved.
  */
 
 package org.ogn.commons.beacon.impl.aprs;
@@ -12,16 +12,14 @@ import static org.ogn.commons.utils.AprsUtils.toUtcTimestamp;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.ogn.commons.beacon.OgnBeacon;
 import org.ogn.commons.beacon.ReceiverBeacon;
 import org.ogn.commons.beacon.impl.OgnBeaconImpl;
 import org.ogn.commons.utils.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.code.regexp.Matcher;
-import com.google.code.regexp.Pattern;
 
 public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon, Serializable {
 
@@ -195,10 +193,82 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
 		// no default implementation
 	}
 
-	public AprsReceiverBeacon(Matcher matcher) {
-		super(matcher);
-		this.srvName = matcher.group("receiver");
+	public AprsReceiverBeacon(final String aprsSentence) {
 
+		List<String> unmachedParams = new ArrayList<>();
+		Matcher matcher = null;
+
+		// remember raw packet string
+		rawPacket = aprsSentence;
+
+		String[] aprsParams = aprsSentence.split("\\s+");
+		for (String aprsParam : aprsParams) {
+
+			if ((matcher = basicAprsPattern.matcher(aprsParam)).matches()) {
+				id = matcher.group(1);
+				srvName = matcher.group(2);
+				timestamp = toUtcTimestamp(matcher.group(3));
+
+				lat = dmsToDeg(Double.parseDouble(matcher.group(4)) / 100);
+				if (matcher.group(5).equals("S"))
+					lat *= -1;
+				lon = dmsToDeg(Double.parseDouble(matcher.group(6)) / 100);
+				if (matcher.group(7).equals("W"))
+					lon *= -1;
+				if (matcher.group(8) != null) { // track+speed are optional
+					track = Integer.parseInt(matcher.group(9));
+					groundSpeed = kntToKmh(Float.parseFloat(matcher.group(10))); // kts
+																					// to
+																					// km/h
+				}
+				alt = feetsToMetres(Float.parseFloat(matcher.group(11)));
+
+			} else if ((matcher = versionPattern.matcher(aprsParam)).matches()) {
+				version = matcher.group(1);
+				platform = matcher.group(2);
+			} else if ((matcher = cpuPattern.matcher(aprsParam)).matches()) {
+				cpuLoad = Float.parseFloat(matcher.group(1));
+			} else if ((matcher = cpuTempPattern.matcher(aprsParam)).matches()) {
+				cpuTemp = Float.parseFloat(matcher.group(1));
+				if (matcher.group(1).equals("-"))
+					cpuTemp *= -1;
+			} else if ((matcher = ramPattern.matcher(aprsParam)).matches()) {
+				freeRam = Float.parseFloat(matcher.group(1));
+				totalRam = Float.parseFloat(matcher.group(2));
+			} else if ((matcher = ntpPattern.matcher(aprsParam)).matches()) {
+				ntpError = Float.parseFloat(matcher.group(1));
+				rtCrystalCorrection = Float.parseFloat(matcher.group(3));
+				if (matcher.group(2).equals("-"))
+					rtCrystalCorrection *= -1;
+			} else if ((matcher = rfPatternFull.matcher(aprsParam)).matches()) {
+				recCrystalCorrection = Integer.parseInt(matcher.group(2));
+				if (matcher.group(1).equals("-"))
+					recCrystalCorrection *= -1;
+				recCrystalCorrectionFine = Float.parseFloat(matcher.group(4));
+				if (matcher.group(3).equals("-"))
+					recCrystalCorrectionFine *= -1;
+				recInputNoise = Float.parseFloat(matcher.group(6));
+				if (matcher.group(5).equals("-"))
+					recInputNoise *= -1;
+			} else if ((matcher = rfPatternLight1.matcher(aprsParam)).matches()) {
+				recInputNoise = Float.parseFloat(matcher.group(1));
+				if (matcher.group(1).equals("-"))
+					recInputNoise *= -1;
+			} else if ((matcher = rfPatternLight2.matcher(aprsParam)).matches()) {
+				recCrystalCorrection = Integer.parseInt(matcher.group(2));
+				if (matcher.group(1).equals("-"))
+					recCrystalCorrection *= -1;
+				recCrystalCorrectionFine = Float.parseFloat(matcher.group(4));
+				if (matcher.group(3).equals("-"))
+					recCrystalCorrectionFine *= -1;
+			} else {
+				unmachedParams.add(aprsParam);
+			}
+		}
+
+		if (!unmachedParams.isEmpty()) {
+			LOG.warn("aprs-sentence:[{}] unmatched aprs parms: {}", aprsSentence, unmachedParams);
+		}
 	}
 
 	@Override
@@ -251,30 +321,5 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
 		if (Float.floatToIntBits(totalRam) != Float.floatToIntBits(other.totalRam))
 			return false;
 		return true;
-	}
-
-	public OgnBeacon update(Matcher receiverMatcher) {
-		this.version = receiverMatcher.group("version");
-		this.platform = receiverMatcher.group("platform");
-		this.cpuLoad = Float.parseFloat(receiverMatcher.group("cpuLoad"));
-		this.freeRam = Float.parseFloat(receiverMatcher.group("ramFree"));
-		this.totalRam = Float.parseFloat(receiverMatcher.group("ramTotal"));
-		
-		this.ntpError = receiverMatcher.group("ntpOffset") == null ? 0 : Float.parseFloat(receiverMatcher.group("ntpOffset"));
-		this.rtCrystalCorrection = receiverMatcher.group("ntpCorrection") == null ? 0 : Float.parseFloat(receiverMatcher.group("ntpCorrection"));
-		//receiverMatcher.group("voltage");
-		//receiverMatcher.group("amperage");
-		this.cpuTemp = receiverMatcher.group("cpuTemperature") == null ? 0 : Float.parseFloat(receiverMatcher.group("cpuTemperature"));
-		//receiverMatcher.group("visibleSenders");
-		//receiverMatcher.group("senders");
-		this.recCrystalCorrection = receiverMatcher.group("rfCorrectionManual") == null ? 0 : Integer.parseInt(receiverMatcher.group("rfCorrectionManual"));
-		this.recCrystalCorrectionFine = receiverMatcher.group("rfCorrectionAutomatic") == null ? 0 : Float.parseFloat(receiverMatcher.group("rfCorrectionAutomatic"));
-		this.recInputNoise = receiverMatcher.group("signalQuality") == null ? 0 : Float.parseFloat(receiverMatcher.group("signalQuality"));
-		/*receiverMatcher.group("sendersSignalQuality");
-		receiverMatcher.group("sendersMessages");
-		receiverMatcher.group("goodSendersSignalQuality");
-		receiverMatcher.group("goodSenders");
-		receiverMatcher.group("goodAndBadSenders");*/
-		return this;
 	}
 }

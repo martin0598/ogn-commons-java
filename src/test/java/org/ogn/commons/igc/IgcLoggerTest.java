@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2017 OGN, All Rights Reserved.
+ * Copyright (c) 2014 OGN, All Rights Reserved.
  */
 
 package org.ogn.commons.igc;
@@ -29,10 +29,8 @@ import org.ogn.commons.beacon.AircraftBeacon;
 import org.ogn.commons.beacon.AircraftDescriptor;
 import org.ogn.commons.beacon.impl.AircraftDescriptorImpl;
 import org.ogn.commons.beacon.impl.aprs.AprsAircraftBeacon;
-import org.ogn.commons.beacon.impl.aprs.AprsLineParser;
 
 public class IgcLoggerTest {
-	AprsLineParser parser = AprsLineParser.get();
 
 	static String[] aprsPhrases = {
 			"FLRDDA325>APRS,qAS,EHHO:/102536h5244.42N/00632.32E'090/075/A=000813 id06DD82AC +198fpm -0.1rot 19.0dB 0e +0.1kHz gps2x3 hear8222 hear9350 hearA4EC",
@@ -94,8 +92,23 @@ public class IgcLoggerTest {
 
 		int i = 0;
 		for (String aprsLine : aprsPhrases) {
-			AircraftBeacon beacon = (AircraftBeacon) parser.parse(aprsLine);
-			logger.log(beacon, descriptors[i++]);
+			AircraftBeacon beacon = new AprsAircraftBeacon(aprsLine);
+			logger.log(beacon, Optional.of(descriptors[i++]));
+		}
+
+		commonVerification(date);
+	}
+
+	@Test
+	public void testSyncWithPredefinedDate() throws Exception {
+		IgcLogger logger = new IgcLogger(IgcLogger.Mode.SYNC);
+
+		LocalDate date = LocalDate.of(2016, 06, 14);
+
+		int i = 0;
+		for (String aprsLine : aprsPhrases) {
+			AircraftBeacon beacon = new AprsAircraftBeacon(aprsLine);
+			logger.log(beacon, Optional.of(date), Optional.of(descriptors[i++]));
 		}
 
 		commonVerification(date.toString());
@@ -107,8 +120,8 @@ public class IgcLoggerTest {
 
 		int i = 0;
 		for (String aprsLine : aprsPhrases) {
-			AircraftBeacon beacon = (AircraftBeacon) parser.parse(aprsLine);
-			logger.log(beacon, descriptors[i++]);
+			AircraftBeacon beacon = new AprsAircraftBeacon(aprsLine);
+			logger.log(beacon, Optional.of(descriptors[i++]));
 		}
 
 		// wait a bit..

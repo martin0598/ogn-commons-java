@@ -79,7 +79,7 @@ public class OgnBeaconImplTest {
 	
 	@Test
 	public void test_ValidBeacons() {
-		URL path = OgnBeaconImplTest.class.getResource("valid_beacons.txt");
+		URL path = getClass().getResource("valid_beacons.txt");
 		File f = null;
 		try {
 			f = new File(path.toURI());

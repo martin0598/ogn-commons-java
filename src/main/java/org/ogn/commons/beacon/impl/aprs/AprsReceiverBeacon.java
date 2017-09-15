@@ -4,14 +4,7 @@
 
 package org.ogn.commons.beacon.impl.aprs;
 
-import static org.ogn.commons.utils.AprsUtils.dmsToDeg;
-import static org.ogn.commons.utils.AprsUtils.feetsToMetres;
-import static org.ogn.commons.utils.AprsUtils.kntToKmh;
-import static org.ogn.commons.utils.AprsUtils.toUtcTimestamp;
-
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.ogn.commons.beacon.OgnBeacon;
 import org.ogn.commons.beacon.ReceiverBeacon;
@@ -21,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.code.regexp.Matcher;
-import com.google.code.regexp.Pattern;
 
 public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon, Serializable {
 
@@ -90,33 +82,6 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
 	 */
 	protected float recInputNoise;
 
-	// D-4465>APRS,qAS,EDMA:/132350h4825.31N/01055.79E'112/002/A=001512
-	// id06DF03B3 -019fpm +0.0rot 39.0dB 0e -6.7kHz
-	// gps1x2 hear0CC5 hearABA7
-
-	// LFLE>APRS,TCPIP*,qAC,GLIDERN1:/203735h4533.44NI00558.59E&020/010/A=000977
-	// v0.2.3.x86 CPU:0.4 RAM:80.9/517.6MB NTP:0.7ms/-25.6ppm RF:+3.80dB";
-
-	private static final Pattern basicAprsPattern = Pattern
-			.compile("(.+?)>APRS,.+,(.+?):/(\\d{6})+h(\\d{4}\\.\\d{2})(N|S).(\\d{5}\\.\\d{2})(E|W).((\\d{3})/(\\d{3}))?/A=(\\d{6}).*?");
-
-	private static final Pattern versionPattern = Pattern.compile("v(\\d+\\.\\d+\\.\\d+)\\.?(.*?)");
-
-	private static final Pattern cpuPattern = Pattern.compile("CPU:(\\d+\\.\\d+)");
-	private static final Pattern cpuTempPattern = Pattern.compile("(\\+|\\-)(\\d+\\.\\d+)C");
-	private static final Pattern ramPattern = Pattern.compile("RAM:(\\d+\\.\\d+)/(\\d+\\.\\d+)MB");
-	private static final Pattern ntpPattern = Pattern.compile("NTP:(\\d+\\.\\d+)ms/(\\+|\\-)(\\d+\\.\\d+)ppm");
-
-	private static final Pattern rfPatternFull = Pattern
-			.compile("RF:(\\+|\\-)(\\d+)(\\+|\\-)(\\d+\\.\\d+)ppm/(\\+|\\-)(\\d+\\.\\d+)dB");
-
-	private static final Pattern rfPatternLight1 = Pattern.compile("RF:(\\+|\\-)(\\d+\\.\\d+)dB");
-
-	private static final Pattern rfPatternLight2 = Pattern.compile("RF:(\\+|\\-)(\\d+)(\\+|\\-)(\\d+\\.\\d+)ppm");
-
-	// Delft>APRS,TCPIP*,qAC,GLIDERN1:/100152h5200.69NI00421.98E&/A=000033
-	// v0.1.3 CPU:0.0 RAM:77.5/458.6MB
-	// NTP:1.1ms/-52.0ppm +45.5C RF:+68+0.0ppm
 
 	@Override
 	public float getCpuLoad() {

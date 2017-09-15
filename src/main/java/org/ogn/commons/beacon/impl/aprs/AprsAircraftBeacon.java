@@ -4,15 +4,10 @@
 
 package org.ogn.commons.beacon.impl.aprs;
 
-import static org.ogn.commons.utils.AprsUtils.dmsToDeg;
 import static org.ogn.commons.utils.AprsUtils.feetsToMetres;
-import static org.ogn.commons.utils.AprsUtils.kntToKmh;
-import static org.ogn.commons.utils.AprsUtils.toUtcTimestamp;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -25,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.code.regexp.Matcher;
-import com.google.code.regexp.Pattern;
 
 public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon {
 

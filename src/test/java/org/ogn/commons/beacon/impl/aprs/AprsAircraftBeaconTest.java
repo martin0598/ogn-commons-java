@@ -7,27 +7,23 @@ package org.ogn.commons.beacon.impl.aprs;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.ogn.commons.beacon.AddressType.FLARM;
-import static org.ogn.commons.beacon.AddressType.ICAO;
-import static org.ogn.commons.beacon.AircraftType.GLIDER;
+import static org.ogn.commons.utils.AprsUtils.feetsToMetres;
 
-import java.util.Arrays;
-import java.util.List;
-
+import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.ogn.commons.beacon.AddressType;
 import org.ogn.commons.beacon.AircraftBeacon;
-import org.ogn.commons.utils.AprsUtils;
+import org.ogn.commons.beacon.AircraftType;
 import org.ogn.commons.utils.JsonUtils;
 
 public class AprsAircraftBeaconTest {
+	String validAprs = "ICA4B0E3A>APRS,qAS,Letzi:/165319h4711.75N\\00802.59E^327/149/A=006498";
 	AprsLineParser parser = AprsLineParser.get();
 
 	@Test
 	public void testEqualsAndHashCode() {
-		String acBeacon = "PH-844>APRS,qAS,Veendam:/102529h5244.42N/00632.07E'089/077/A=000876 id06DD82AC -474fpm +0.1rot 7.8dB 1e +0.7kHz gps2x3 hear8222";
+		String acBeacon = validAprs + " id06DD82AC -474fpm +0.1rot 7.8dB 1e +0.7kHz gps2x3 hear8222";
 
 		AircraftBeacon b1 = (AircraftBeacon) parser.parse(acBeacon);
 		AircraftBeacon b2 = (AircraftBeacon) parser.parse(acBeacon);
@@ -37,86 +33,9 @@ public class AprsAircraftBeaconTest {
 		assertNotSame(b1, b2);
 	}
 
+	@Ignore
 	@Test
-	public void test1() {
-		String acBeacon = "PH-844>APRS,qAS,Veendam:/102529h5244.42N/00632.07E'089/077/A=000876 id06DD82AC -474fpm +0.1rot 7.8dB 1e +0.7kHz gps2x3 hear8222 hear8223 hear8224";
-
-		AircraftBeacon b1 = (AircraftBeacon) parser.parse(acBeacon);
-
-		assertNotNull(b1);
-
-		assertEquals(acBeacon, b1.getRawPacket());
-
-		assertEquals("PH-844", b1.getId());
-
-		assertEquals(0, AprsUtils.toUtcTimestamp(10, 25, 29) - b1.getTimestamp());
-
-		assertEquals(GLIDER, b1.getAircraftType());
-		assertEquals(-2.4f, b1.getClimbRate(), 0.1);
-
-		assertEquals(1, b1.getErrorCount());
-		assertEquals(0.7, b1.getFrequencyOffset(), 0.01);
-		assertEquals("2x3", b1.getGpsStatus());
-		assertEquals(142.6f, b1.getGroundSpeed(), 0.01);
-		assertEquals(3, b1.getHeardAircraftIds().length);
-		List<String> hearIds = Arrays.asList(b1.getHeardAircraftIds());
-		assertTrue(hearIds.contains("8222"));
-		assertTrue(hearIds.contains("8223"));
-		assertTrue(hearIds.contains("8224"));
-
-		assertEquals("DD82AC", b1.getAddress());
-		assertEquals(FLARM, b1.getAddressType());
-
-		assertEquals(52.74033f, b1.getLat(), 0.0001);
-		assertEquals(6.5345, b1.getLon(), 0.0001);
-		assertEquals(267.0, b1.getAlt(), 0.001);
-
-		assertEquals("Veendam", b1.getReceiverName());
-
-		assertEquals(7.8, b1.getSignalStrength(), 0.01);
-		assertEquals(89, b1.getTrack());
-		assertEquals(0.1, b1.getTurnRate(), 0.01);
-	}
-
-	@Test
-	public void test2() {
-		String acBeacon = "incorrect > ! Cdd blah blah blah xxx beacon $$ format";
-
-		AircraftBeacon b1 = (AircraftBeacon) parser.parse(acBeacon);
-
-		assertEquals(acBeacon, b1.getRawPacket());
-
-		// still, the object should be created (although its attributes won't be
-		// initialized)
-		assertNotNull(b1);
-	}
-
-	@Test
-	public void test3() {
-		String acBeacon = "PH-1345>APRS,qAS,LFGP:/133244h4758.48N/00346.17E'274/028/A=001138 id06DD8652 -019fpm -10.6rot 18.8dB 0e -2.5kHz gps5x11 hear8E05 hear8F0F hearAA4A";
-
-		AircraftBeacon b1 = (AircraftBeacon) parser.parse(acBeacon);
-
-		assertEquals(-10.6f, b1.getTurnRate(), 0.0f);
-	}
-
-	@Test
-	public void test4() {
-
-		// NO gpsHxV (OGN tracker uses NMEA GPS, so these numbers will not be
-		// available)
-		String acBeacon = "PH-1345>APRS,qAS,LFGP:/133244h4758.48N/00346.17E'274/028/A=001138 id06DD8652 -019fpm -10.6rot 18.8dB 0e -2.5kHz hear8E05 hear8F0F hearAA4A";
-
-		AircraftBeacon b1 = (AircraftBeacon) parser.parse(acBeacon);
-
-		assertNull(b1.getGpsStatus());
-		System.out.println(JsonUtils.toJson(b1));
-	}
-
-	@Test
-	public void test5() {
-		// test against incorrect beacon format
-
+	public void corrupted_beacon() {
 		String acBeacon = "F-PVVA>APRS,qAS,CHALLES:/130435h4534.95N/00559.83E'237/105/A=002818|$#*IL<&z#XLx|";
 		AircraftBeacon b1 = (AircraftBeacon) parser.parse(acBeacon);
 
@@ -126,92 +45,81 @@ public class AprsAircraftBeaconTest {
 		assertEquals(AddressType.UNRECOGNIZED, b1.getAddressType());
 	}
 
+	@Ignore
 	@Test
-	public void test6() {
-
-		String acBeacon = "FLRDDEAAB>APRS,qAS,Hornberg:/153509h4844.83N/00951.62E'301/001/A=002365 id06DDEAAB +020fpm -0.7rot 53.2dB 0e +0.7kHz gps3x5";
-		AircraftBeacon b1 = (AircraftBeacon) parser.parse(acBeacon);
-
-		assertNotNull(b1);
-
-		String jsonB1 = JsonUtils.toJson(b1);
-
-		AircraftBeacon b2 = JsonUtils.fromJson(jsonB1, AprsAircraftBeacon.class);
-
-		assertEquals(b1, b2);
-	}
-
-	@Test
-	public void test7() {
-
-		String acBeacon = "FLRDDEAAB>APRS,qAS,Hornberg:/153^^509h4844.83N/00951.62E'301/001/A=002365 33sss3 XX!~@SS id06DDEAAB +020fpm -0.7rot 53.2dB 0e +0.7kHz gps3x5";
+	public void corrupted_beacon2() {
+		String acBeacon = validAprs + " 33sss3 XX!~@SS id06DDEAAB +020fpm -0.7rot 53.2dB 0e +0.7kHz gps3x5";
+		
 		AircraftBeacon b1 = (AircraftBeacon) parser.parse(acBeacon);
 
 		assertNotNull(b1);
 		assertEquals(acBeacon, b1.getRawPacket());
 	}
-
+	
 	@Test
-	public void test8() {
+    public void test_invalid_token() {
+    	AircraftBeacon aircraft_beacon = (AircraftBeacon) parser.parse(validAprs + " notAValidToken");
+    	Assert.assertNull(aircraft_beacon);
+    }
+       
+    @Test
+    public void test_basic() {
+        AircraftBeacon aircraft_beacon = (AircraftBeacon) parser.parse(validAprs + " id0ADDA5BA -454fpm -1.1rot 8.8dB 0e +51.2kHz gps4x5 hear1084 hearB597 hearB598");
+        Assert.assertEquals(AddressType.FLARM, aircraft_beacon.getAddressType());
+        Assert.assertEquals(AircraftType.TOW_PLANE, aircraft_beacon.getAircraftType());
+        Assert.assertFalse(aircraft_beacon.isStealth());
+        Assert.assertEquals("DDA5BA", aircraft_beacon.getAddress());
+        Assert.assertEquals(feetsToMetres(-454) / 60.0, aircraft_beacon.getClimbRate(), 0.01);
+        Assert.assertEquals(-1.1, aircraft_beacon.getTurnRate(), 0.01);
+        Assert.assertEquals(8.8, aircraft_beacon.getSignalStrength(), 0.01);
+        Assert.assertEquals(0, aircraft_beacon.getErrorCount());
+        Assert.assertEquals(51.2, aircraft_beacon.getFrequencyOffset(), 0.01);
+        Assert.assertEquals("4x5", aircraft_beacon.getGpsStatus());
+        Assert.assertEquals(3, aircraft_beacon.getHeardAircraftIds().length);
+        Assert.assertEquals("1084", aircraft_beacon.getHeardAircraftIds()[0]);
+        Assert.assertEquals("B597", aircraft_beacon.getHeardAircraftIds()[1]);
+        Assert.assertEquals("B598", aircraft_beacon.getHeardAircraftIds()[2]);
+    }
 
-		// test the extended format of APRS packet (additional lat/lon digits)
-		String acBeacon = "FLRDD940D>APRS,qAS,LFLE:/075524h4533.44N/00558.73E'000/000/A=000974 !W61! id0ADD940D +020fpm +0.0rot 53.8dB 0e -0.3kHz gps6x8";
-		AircraftBeacon b1 = (AircraftBeacon) parser.parse(acBeacon);
+    @Test
+    public void test_stealth() {
+        AircraftBeacon aircraft_beacon = (AircraftBeacon) parser.parse(validAprs + " id0ADD1234 -454fpm -1.1rot 8.8dB 0e +51.2kHz gps4x5 hear1084 hearB597 hearB598");
+        Assert.assertFalse(aircraft_beacon.isStealth());
 
-		acBeacon = "FLRDD940D>APRS,qAS,LFLE:/075524h4533.44N/00558.73E'000/000/A=000974 !W00! id0ADD940D +020fpm +0.0rot 53.8dB 0e -0.3kHz gps6x8";
-		AircraftBeacon b2 = (AircraftBeacon) parser.parse(acBeacon);
+        aircraft_beacon = (AircraftBeacon) parser.parse(validAprs + " id8ADD1234 -454fpm -1.1rot 8.8dB 0e +51.2kHz gps4x5 hear1084 hearB597 hearB598");
+        Assert.assertTrue(aircraft_beacon.isStealth());
+    }
 
-		assertNotNull(b1);
-		assertNotNull(b2);
+    @Test
+    public void test_v024() {
+    	AircraftBeacon aircraft_beacon = (AircraftBeacon) parser.parse(validAprs + " id21400EA9 -2454fpm +0.9rot 19.5dB 0e -6.6kHz gps1x1 s6.02 h0A rDF0C56");
 
-		assertTrue(b1.getLat() > b2.getLat());
-		assertTrue(b1.getLon() > b2.getLon());
-	}
+        Assert.assertEquals(6.02, aircraft_beacon.getFirmwareVersion(), 0.01);
+        Assert.assertEquals(10, aircraft_beacon.getHardwareVersion());
+        Assert.assertEquals("DF0C56", aircraft_beacon.getOriginalAddress());
+    }
 
-	@Test
-	// test parsing of new fields in beacon as from v. 0.2.5
-	public void test9() {
-		String acBeacon = "ICA4B4E68>APRS,qAS,Letzi:/152339h4726.50N/00814.20E'260/059/A=002253 !W65! id054B4E68 -395fpm -1.5rot 16.5dB 0e -14.3kHz gps1x2 s6.05 h4C rDF0CD1 +4.5dBm";
-		AircraftBeacon b1 = (AircraftBeacon) parser.parse(acBeacon);
+    @Test
+    public void test_v024_ogn_tracker() {
+    	AircraftBeacon aircraft_beacon = (AircraftBeacon) parser.parse(validAprs + " id07353800 +020fpm -14.0rot FL004.43 38.5dB 0e -2.9kHz");
 
-		assertNotNull(b1);
+        Assert.assertEquals(4.43, aircraft_beacon.getFlightLevel(), 0.01);
+    }
 
-		assertEquals(acBeacon, b1.getRawPacket());
+    @Test
+    public void test_v025() {
+    	AircraftBeacon aircraft_beacon = (AircraftBeacon) parser.parse(validAprs + " id06DDE28D +535fpm +3.8rot 11.5dB 0e -1.0kHz gps2x3 s6.01 h0C +7.4dBm");
 
-		assertEquals(0, AprsUtils.toUtcTimestamp(15, 23, 39) - b1.getTimestamp());
+        Assert.assertEquals(7.4, aircraft_beacon.getERP(), 0.01);
+    }
 
-		assertEquals("Letzi", b1.getReceiverName());
-		assertEquals(GLIDER, b1.getAircraftType());
+    @Test
+    public void test_v026() {
+        // from 0.2.6 it is sufficent we have only the ID, climb and turn rate or just the ID
+        AircraftBeacon aircraft_beacon_triple = (AircraftBeacon) parser.parse(validAprs + " id093D0930 +000fpm +0.0rot");
+        AircraftBeacon aircraft_beacon_single = (AircraftBeacon) parser.parse(validAprs + " id093D0930");
 
-		assertEquals(ICAO, b1.getAddressType());
-		assertEquals("4B4E68", b1.getAddress());
-		assertEquals("DF0CD1", b1.getOriginalAddress());
-
-		assertEquals(6.05f, b1.getFirmwareVersion(), 0.01f);
-		assertEquals(0x4C, b1.getHardwareVersion());
-		assertEquals(4.5f, b1.getERP(), 0.01f);
-
-		String jsonB1 = JsonUtils.toJson(b1);
-		System.out.println(jsonB1);
-
-		AircraftBeacon b2 = JsonUtils.fromJson(jsonB1, AprsAircraftBeacon.class);
-
-		String jsonB2 = JsonUtils.toJson(b2);
-
-		System.out.println(jsonB2);
-
-		assertEquals(b1, b2);
-	}
-
-	@Test
-	public void testFlghtLevelInBeacon() {
-		String acBeacon = "OGN37413F>APRS,qAS,LKMO:/092623h5031.47N/01340.79E'000/000/A=001105 !W39! id0737413F +040fpm +0.0rot FL009.12 31.8dB 0e -2.1kHz";
-
-		AircraftBeacon b1 = (AircraftBeacon) parser.parse(acBeacon);
-
-		assertNotNull(b1);
-
-		assertEquals(9.12f, b1.getFlightLevel(), 0.01f);
-	}
-
+        Assert.assertNotNull(aircraft_beacon_triple);
+        Assert.assertNotNull(aircraft_beacon_single);
+    }
 }

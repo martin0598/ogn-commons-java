@@ -7,12 +7,14 @@ package org.ogn.commons.beacon.impl.aprs;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
 
+import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.ogn.commons.beacon.ReceiverBeacon;
 
 public class AprsReceiverBeaconTest {
+	String validAprs = "Ulrichamn>APRS,TCPIP*,qAC,GLIDERN1:/085616h5747.30NI01324.77E&/A=001322";
 	AprsLineParser parser = AprsLineParser.get();
 
 	@Test
@@ -27,82 +29,10 @@ public class AprsReceiverBeaconTest {
 		assertNotSame(b1, b2);
 	}
 
+
+	@Ignore
 	@Test
-	public void test1() {
-		String recBeacon = "EBZW>APRS,TCPIP*,qAC,GLIDERN1:/102546h5100.86NI00531.43E&/A=000298 v1.0.4.ARM CPU:0.9 RAM:968.2/1056.5MB NTP:1.5ms/-20.0ppm RF:+127-2.9ppm/+4.3dB";
-
-		ReceiverBeacon b1 = (ReceiverBeacon) parser.parse(recBeacon);
-
-		assertNotNull(b1);
-
-		// System.out.println(JsonUtils.toJson(b1));
-
-		assertEquals(recBeacon, b1.getRawPacket());
-
-		assertEquals("EBZW", b1.getId());
-		assertEquals("1.0.4", b1.getVersion());
-		assertEquals(100004, b1.getNumericVersion());
-		assertEquals("ARM", b1.getPlatform());
-
-		assertEquals("GLIDERN1", b1.getServerName());
-
-		assertEquals(51.0143333f, b1.getLat(), 1e-4);
-		assertEquals(5.52383333f, b1.getLon(), 1e-4);
-		assertEquals(90.8f, b1.getAlt(), 1e-2);
-
-		assertEquals(968.2f, b1.getFreeRam(), 1e-2);
-		assertEquals(1056.5, b1.getTotalRam(), 1e-2);
-
-		assertEquals(0.9, b1.getCpuLoad(), 1e-2);
-		assertEquals(Float.NaN, b1.getCpuTemp(), 0.001);
-
-		assertEquals(1.5f, b1.getNtpError(), 1e-2);
-		assertEquals(-20.0f, b1.getRtCrystalCorrection(), 1e-2);
-
-		assertEquals(127, b1.getRecCrystalCorrection());
-		assertEquals(-2.9, b1.getRecCrystalCorrectionFine(), 1e-2);
-		assertEquals(127 + (-2.9), b1.getRecAbsCorrection(), 1e-2);
-
-		assertEquals(4.3f, b1.getRecInputNoise(), 1e-2);
-
-		recBeacon = "HHWaard>APRS,TCPIP*,qAC,GLIDERN2:/102540h5240.05NI00450.69E&/A=000020 CPU:1.1 RAM:223.5/458.7MB NTP:0.3ms/-14.8ppm +40.6C RF:+49+4.1ppm/+0.2dB";
-		b1 = (ReceiverBeacon) parser.parse(recBeacon);
-		assertEquals(40.6, b1.getCpuTemp(), 1e-2);
-		assertNull(b1.getVersion());
-		assertEquals(0, b1.getNumericVersion());
-		assertNull(b1.getPlatform());
-
-		// check a version with just noise in the RF
-		recBeacon = "Solothurn>APRS,TCPIP*,qAC,GLIDERN2:/220227h4712.67NI00731.89E&/A=001509 v0.2.2 CPU:0.8 RAM:301.2/456.4MB NTP:0.8ms/-37.7ppm +34.2C RF:+0.99dB";
-		b1 = (ReceiverBeacon) parser.parse(recBeacon);
-		assertNotNull(b1);
-		assertEquals(0.0f, b1.getRecAbsCorrection(), 1e-4);
-		assertEquals(0, b1.getRecCrystalCorrection());
-		assertEquals(0.0f, b1.getRecCrystalCorrectionFine(), 1e-4);
-		assertEquals(0.99f, b1.getRecInputNoise(), 1e-4);
-
-		recBeacon = "Gladbck>APRS,TCPIP*,qAC,GLIDERN2:/095759h5133.28NI00659.55E&/A=000154 v0.1.3 CPU:0.1 RAM:287.6/458.6MB NTP:0.3ms/-10.0ppm +40.1C RF:+53+1.0ppm";
-		b1 = (ReceiverBeacon) parser.parse(recBeacon);
-		assertNotNull(b1);
-		assertEquals(53, b1.getRecCrystalCorrection());
-		assertEquals(1.0f, b1.getRecCrystalCorrectionFine(), 1e-4);
-		assertEquals(0.0f, b1.getRecInputNoise(), 1e-4);
-
-		recBeacon = "LFLE>APRS,TCPIP*,qAC,GLIDERN1:/203735h4533.44NI00558.59E&020/010/A=000977 v0.2.3.x86 CPU:0.4 RAM:80.9/517.6MB NTP:0.7ms/-25.6ppm RF:+3.80dB";
-		b1 = (ReceiverBeacon) parser.parse(recBeacon);
-
-		assertEquals(20, b1.getTrack());
-		assertEquals(18.52, b1.getGroundSpeed(), 1e-4);
-		assertEquals("x86", b1.getPlatform());
-
-		// v.0.2.5 - just to make sure ther's no difference in the 0.2.5 beacon format
-		recBeacon = "Annecy>APRS,TCPIP*,qAC,GLIDERN1:/000024h4552.11NI00612.79E&/A=002132 v0.2.5.ARM CPU:0.6 RAM:651.4/877.1MB NTP:6.5ms/+6.1ppm +34.0C RF:+47-1.9ppm/+1.42dB";
-		b1 = (ReceiverBeacon) parser.parse(recBeacon);
-		assertEquals("0.2.5", b1.getVersion());
-	}
-
-	@Test
-	public void test2() {
+	public void corrupted_beacon() {
 		String recBeacon = "incorrect > ! Cdd blah blah blah xxx beacon $$ format";
 
 		ReceiverBeacon b1 = (ReceiverBeacon) parser.parse(recBeacon);
@@ -113,5 +43,63 @@ public class AprsReceiverBeaconTest {
 		// be initialized)
 		assertNotNull(b1);
 	}
+
+	
+	@Test
+    public void test_fail_validation() {
+		ReceiverBeacon receiver_beacon = (ReceiverBeacon) parser.parse(validAprs + " notAValidToken");
+		Assert.assertNull(receiver_beacon); 
+	}
+	
+    @Test
+    public void test_v021() {
+        ReceiverBeacon receiver_beacon = (ReceiverBeacon) parser.parse(validAprs + " v0.2.1 CPU:0.8 RAM:25.6/458.9MB NTP:0.1ms/+2.3ppm +51.9C RF:+26-1.4ppm/-0.25dB");
+        Assert.assertEquals("0.2.1", receiver_beacon.getVersion());
+        Assert.assertEquals(0.8, receiver_beacon.getCpuLoad(), 0.01);
+        Assert.assertEquals(25.6, receiver_beacon.getFreeRam(), 0.01);
+        Assert.assertEquals(458.9, receiver_beacon.getTotalRam(), 0.01);
+        Assert.assertEquals(0.1, receiver_beacon.getNtpError(), 0.01);
+        Assert.assertEquals(2.3, receiver_beacon.getRtCrystalCorrection(), 0.01);
+        Assert.assertEquals(51.9,  receiver_beacon.getCpuTemp(), 0.01);
+        
+        Assert.assertEquals(26, receiver_beacon.getRecCrystalCorrection());
+        Assert.assertEquals(-1.4, receiver_beacon.getRecCrystalCorrectionFine(), 0.01);
+        Assert.assertEquals(-0.25, receiver_beacon.getRecInputNoise(), 0.01);
+    }
+
+    @Test
+    public void test_v022() {
+    	ReceiverBeacon receiver_beacon = (ReceiverBeacon) parser.parse(validAprs + " v0.2.2.x86 CPU:0.5 RAM:669.9/887.7MB NTP:1.0ms/+6.2ppm +52.0C RF:+0.06dB");
+        Assert.assertEquals("x86", receiver_beacon.getPlatform());
+    }
+
+    @Ignore
+    @Test
+    public void test_v025() {
+		ReceiverBeacon receiver_beacon = (ReceiverBeacon) parser.parse(validAprs + " v0.2.5.RPI-GPU CPU:0.8 RAM:287.3/458.7MB NTP:1.0ms/-6.4ppm 5.016V 0.534A +51.9C RF:+55+0.4ppm/-0.67dB/+10.8dB@10km[57282]");
+        //Assert.assertEquals(5.016, receiver_beacon.getVoltage(), 0.01);
+        //Assert.assertEquals(0.534, receiver_beacon.getAmperage(), 0.01);
+        //Assert.assertEquals(10.8, receiver_beacon.getSendersSignal(), 0.01);
+        //Assert.assertEquals(57282, receiver_beacon.getSendersMessages();
+
+        receiver_beacon = (ReceiverBeacon) parser.parse(validAprs + " v0.2.5.ARM CPU:0.4 RAM:638.0/970.5MB NTP:0.2ms/-1.1ppm +65.5C 14/16Acfts[1h] RF:+45+0.0ppm/+3.88dB/+24.0dB@10km[143717]/+26.7dB@10km[68/135]");
+        //Assert.assertEquals(14, receiver_beacon.getSendersVisible());
+        //Assert.assertEquals(16, receiver_beacon.getSendersTotal());
+        //Assert.assertEquals(24.0, receiver_beacon.getSendersSignal());
+        //Assert.assertEquals(143717, receiver_beacon.getSendersMessages());
+        //Assert.assertEquals(26.7, receiver_beacon.getGoodSendersSignal());
+        //Assert.assertEquals(68, receiver_beacon.getGoodSenders());
+        //Assert.assertEquals(135, receiver_beacon.getGoodAndBadSenders());
+    }
+
+    @Test
+    public void test_v026() {
+		ReceiverBeacon receiver_beacon = (ReceiverBeacon) parser.parse(validAprs);
+		Assert.assertNotNull(receiver_beacon);
+		
+        // Test default values
+        Assert.assertEquals(0, receiver_beacon.getRecCrystalCorrection(), 0.01);
+        Assert.assertEquals(0, receiver_beacon.getRecCrystalCorrectionFine(), 0.01);
+    }
 
 }

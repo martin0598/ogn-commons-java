@@ -16,6 +16,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -57,7 +59,7 @@ public class OgnBeaconImplTest {
 	
 	@Test
 	public void test_AircraftBeacon() {
-		AircraftBeacon beacon = (AircraftBeacon)parser.parse("ZK-GSC>APRS,qAS,Omarama:/165202h4429.25S/16959.33E'/A=001407 id05C821EA +020fpm +0.0rot 16.8dB 0e -3.1kHz gps1x3");// hear1084 hearB597 hearB598");
+		AircraftBeacon beacon = (AircraftBeacon)parser.parse("ZK-GSC>APRS,qAS,Omarama:/165202h4429.25S/16959.33E'/A=001407 id05C821EA +020fpm +0.0rot 16.8dB 0e -3.1kHz gps1x3 hear1084 hearB597 hearB598");
 		Assert.assertEquals("ZK-GSC", beacon.getId());
 		Assert.assertEquals("Omarama", beacon.getReceiverName());
 		Assert.assertEquals(toUtcTimestamp(16, 52, 02), beacon.getTimestamp());
@@ -75,18 +77,16 @@ public class OgnBeaconImplTest {
 		Assert.assertEquals(16.8, beacon.getSignalStrength(), 0.01);
 		Assert.assertEquals(0, beacon.getErrorCount());
 		Assert.assertEquals(-3.1, beacon.getFrequencyOffset(), 0.01);
+		Assert.assertEquals(3, beacon.getHeardAircraftIds().length);
+		Assert.assertEquals("1084",  beacon.getHeardAircraftIds()[0]);
+		Assert.assertEquals("B597",  beacon.getHeardAircraftIds()[1]);
+		Assert.assertEquals("B598",  beacon.getHeardAircraftIds()[2]);
 	}
 	
 	@Test
 	public void test_ValidBeacons() {
-		URL path = getClass().getResource("valid_beacons.txt");
-		File f = null;
-		try {
-			f = new File(path.toURI());
-		} catch (URISyntaxException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		Path path = Paths.get("src/test/java/org/ogn/commons/beacon/impl/valid_beacons.txt");
+		File f = path.toFile();
 		
 		try (BufferedReader br = new BufferedReader(new FileReader(f))) {
 			for(String line; (line = br.readLine()) != null; ) {

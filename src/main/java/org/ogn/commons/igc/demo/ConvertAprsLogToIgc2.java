@@ -16,12 +16,12 @@ public class ConvertAprsLogToIgc2 {
 
 	static AircraftDescriptorProvider provider = new FileDbDescriptorProvider<OgnDb>(OgnDb.class);
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 
-		String aprsLogfileName = ConvertAprsLogToIgc.getAprsLogFileName(args);
-		IgcLogger igcLogger = ConvertAprsLogToIgc.createIgcLogger(args);
-		LocalDate dateOfFlight = ConvertAprsLogToIgc.getDateOfFlight(args);
-		
+		final String aprsLogfileName = ConvertAprsLogToIgc.getAprsLogFileName(args);
+		final IgcLogger igcLogger = ConvertAprsLogToIgc.createIgcLogger(args);
+		final LocalDate dateOfFlight = ConvertAprsLogToIgc.getDateOfFlight(args);
+
 		ConvertAprsLogToIgc.processAprsLogFile(aprsLogfileName, dateOfFlight, igcLogger, provider);
 
 		System.exit(0);

@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  */
 public class OgnDb extends FileDb {
 
-	private static Logger LOG = LoggerFactory.getLogger(OgnDb.class);
+	private static final Logger LOG = LoggerFactory.getLogger(OgnDb.class);
 
 	private static final String DEFAULT_DEVICES_DB_URL = "http://ddb.glidernet.org/download";
 
@@ -32,7 +32,7 @@ public class OgnDb extends FileDb {
 	@Override
 	protected AircraftDescriptorWithId processLine(String line) {
 
-		String str = line.trim();
+		final String str = line.trim();
 
 		// skip header line
 		if (str.length() == 0 || line.startsWith(COMMENT))
@@ -40,22 +40,22 @@ public class OgnDb extends FileDb {
 
 		LOG.trace(line);
 
-		String[] tokens = str.split(DELIMITER);
+		final String[] tokens = str.split(DELIMITER);
 
 		if (tokens.length < 6)
 			throw new IllegalArgumentException("this line does not comply with the format: " + line);
 
 		// DEVICE_TYPE,DEVICE_ID,AIRCRAFT_MODEL,REGISTRATION,CN,TRACKED,IDENTIFIED
 
-		String id = tokens[1].substring(1, tokens[1].length() - 1).trim();
-		String model = tokens[2].substring(1, tokens[2].length() - 1).trim();
-		String regNumber = tokens[3].substring(1, tokens[3].length() - 1).trim();
-		String cn = tokens[4].substring(1, tokens[4].length() - 1).trim();
+		final String id = tokens[1].substring(1, tokens[1].length() - 1).trim();
+		final String model = tokens[2].substring(1, tokens[2].length() - 1).trim();
+		final String regNumber = tokens[3].substring(1, tokens[3].length() - 1).trim();
+		final String cn = tokens[4].substring(1, tokens[4].length() - 1).trim();
 
-		String tracked = tokens[5].substring(1, tokens[5].length() - 1).trim();
-		String identified = tokens[6].substring(1, tokens[6].length() - 1).trim();
+		final String tracked = tokens[5].substring(1, tokens[5].length() - 1).trim();
+		final String identified = tokens[6].substring(1, tokens[6].length() - 1).trim();
 
-		AircraftDescriptor desc = new AircraftDescriptorImpl(regNumber, cn, model, toBoolean(tracked),
+		final AircraftDescriptor desc = new AircraftDescriptorImpl(regNumber, cn, model, toBoolean(tracked),
 				toBoolean(identified));
 
 		return new AircraftDescriptorWithId(id, desc);

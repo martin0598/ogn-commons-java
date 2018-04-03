@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  */
 public class IgcLogger {
 
-	public static enum Mode {
+	public enum Mode {
 		ASYNC, SYNC
 	}
 
@@ -43,11 +43,11 @@ public class IgcLogger {
 
 	private static final String DEFAULT_IGC_BASE_DIR = "log";
 
-	private String igcBaseDir;
+	private final String igcBaseDir;
 
 	private static final String LINE_SEP = System.lineSeparator();
 
-	private Mode workingMode;
+	private final Mode workingMode;
 
 	private BlockingQueue<LogRecord> logRecords;
 	private volatile Future<?> pollerFuture;
@@ -71,26 +71,24 @@ public class IgcLogger {
 	}
 
 	private class PollerTask implements Runnable {
-		private Logger PLOG = LoggerFactory.getLogger(PollerTask.class);
-
 		@Override
 		public void run() {
-			PLOG.trace("starting...");
+			LOG.trace("starting...");
 			LogRecord record = null;
 			while (!Thread.interrupted()) {
 				try {
 					record = logRecords.take();
 					logToIgcFile(record.beacon, record.date, record.descriptor);
-				} catch (InterruptedException e) {
-					PLOG.trace("interrupted exception caught. Was the poller task interrupted on purpose?");
+				} catch (final InterruptedException e) {
+					LOG.trace("interrupted exception caught. Was the poller task interrupted on purpose?");
 					Thread.currentThread().interrupt();
 					continue;
-				} catch (Exception e) {
-					PLOG.error("exception caught", e);
+				} catch (final Exception e) {
+					LOG.error("exception caught", e);
 					continue;
 				}
 			} // while
-			PLOG.trace("exiting..");
+			LOG.trace("exiting..");
 		}
 	}
 
@@ -121,7 +119,7 @@ public class IgcLogger {
 	private void writeIgcHeader(FileWriter igcFile, ZonedDateTime datetime, Optional<AircraftDescriptor> descriptor) {
 
 		// Write IGC file header
-		StringBuilder bld = new StringBuilder();
+		final StringBuilder bld = new StringBuilder();
 		try {
 			bld.append("AGNE001 OGN gateway").append(LINE_SEP);
 			bld.append("HFDTE").append(String.format("%02d", datetime.getDayOfMonth()))
@@ -133,14 +131,14 @@ public class IgcLogger {
 																						// the
 																						// year
 
-			if (descriptor != null && descriptor.isPresent())
+			if (descriptor.isPresent())
 				bld.append(LINE_SEP).append("HFGIDGLIDERID:").append(descriptor.get().getRegNumber()).append(LINE_SEP)
 						.append("HFGTYGLIDERTYPE:").append(descriptor.get().getModel()).append(LINE_SEP)
 						.append("HFCIDCOMPETITIONID:").append(descriptor.get().getCN()).append(LINE_SEP);
 
 			igcFile.write(bld.toString());
 
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			LOG.error("exception caught", e);
 		}
 	}
@@ -148,35 +146,33 @@ public class IgcLogger {
 	private void logToIgcFile(final AircraftBeacon beacon, final Optional<LocalDate> date,
 			final Optional<AircraftDescriptor> descriptor) {
 
-		String igcId = IgcUtils.toIgcLogFileId(beacon, descriptor);
+		final String igcId = IgcUtils.toIgcLogFileId(beacon, descriptor);
 
-		LocalDate d = date.isPresent() ? date.get() : LocalDate.now();
+		final LocalDate d = date.isPresent() ? date.get() : LocalDate.now();
 
-		ZonedDateTime beaconTimestamp = ZonedDateTime.ofInstant(Instant.ofEpochMilli(beacon.getTimestamp()),
+		final ZonedDateTime beaconTimestamp = ZonedDateTime.ofInstant(Instant.ofEpochMilli(beacon.getTimestamp()),
 				ZoneOffset.UTC);
 
 		// take the time part from the beacon
-		ZonedDateTime timestamp = ZonedDateTime.of(d,
+		final ZonedDateTime timestamp = ZonedDateTime.of(d,
 				LocalTime.of(beaconTimestamp.getHour(), beaconTimestamp.getMinute(), beaconTimestamp.getSecond()),
 				ZoneOffset.UTC);
 
-		StringBuilder dateString = new StringBuilder(String.format("%04d", timestamp.getYear())).append("-")
+		final StringBuilder dateString = new StringBuilder(String.format("%04d", timestamp.getYear())).append("-")
 				.append(String.format("%02d", timestamp.getMonth().getValue())).append("-")
 				.append(String.format("%02d", timestamp.getDayOfMonth()));
 
 		// Generate filename from date and immat
-		String igcFileName = new String(dateString + "_" + igcId + ".IGC");
+		final String igcFileName = dateString + "_" + igcId + ".IGC";
 
-		File theDir = new File(igcBaseDir);
-		if (!theDir.exists()) {
-			// if directory doesn't exist create it
-			if (!theDir.mkdir()) {
-				LOG.warn("the directory {} could not be created", theDir);
-				return;
-			}
+		final File theDir = new File(igcBaseDir);
+
+		if (!theDir.exists() && !theDir.mkdir()) {
+			LOG.warn("the directory {} could not be created", theDir);
+			return;
 		}
 
-		File subDir = new File(igcBaseDir + File.separatorChar + dateString);
+		final File subDir = new File(igcBaseDir + File.separatorChar + dateString);
 		if (!subDir.exists()) {
 			// if directory doesn't exist create it
 			if (!subDir.mkdir()) {
@@ -185,10 +181,10 @@ public class IgcLogger {
 			}
 		}
 
-		String filePath = igcBaseDir + File.separatorChar + dateString + File.separatorChar + igcFileName;
+		final String filePath = igcBaseDir + File.separatorChar + dateString + File.separatorChar + igcFileName;
 
 		// Check if the IGC file already exist
-		File f = new File(filePath);
+		final File f = new File(filePath);
 
 		boolean writeHeader = false;
 		if (!f.exists())
@@ -199,7 +195,7 @@ public class IgcLogger {
 		// create (if not exists) and/or open the file
 		try {
 			igcFile = new FileWriter(filePath, true);
-		} catch (IOException ex) {
+		} catch (final IOException ex) {
 			LOG.error("exception caught", ex);
 			return; // no point to continue - file could not be created
 		}
@@ -213,7 +209,7 @@ public class IgcLogger {
 		// Add fix
 		try {
 
-			StringBuilder bld = new StringBuilder();
+			final StringBuilder bld = new StringBuilder();
 
 			// log original APRS sentence to IGC file for debug, SAR & co
 			bld.append("LGNE ").append(beacon.getRawPacket()).append(LINE_SEP);
@@ -238,12 +234,12 @@ public class IgcLogger {
 
 			igcFile.write(bld.toString());
 
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			LOG.error("exception caught", e);
 		} finally {
 			try {
 				igcFile.close();
-			} catch (Exception ex) {
+			} catch (final Exception ex) {
 				LOG.warn("could not close igc file", ex);
 			}
 		}

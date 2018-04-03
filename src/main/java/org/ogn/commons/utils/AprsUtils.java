@@ -23,6 +23,12 @@ import org.ogn.commons.beacon.OgnBeacon;
 
 public class AprsUtils {
 
+	private static final int RADIUS = 6371000;
+
+	private AprsUtils() {
+
+	}
+
 	/**
 	 * Generates APRS login sentence, required by APRS server. Refer to
 	 * <a href="http://www.aprs-is.net/Connecting.aspx">Connecting to APRS-IS</a> for details.
@@ -52,38 +58,38 @@ public class AprsUtils {
 	 */
 	public static String generateClientId() {
 		try {
-			String suffix = UUID.randomUUID().toString().split("-")[3].toUpperCase();
-			String res = InetAddress.getLocalHost().getHostName().substring(0, 3).toUpperCase();
-			StringBuilder bld = new StringBuilder(res.replace("-", ""));
+			final String suffix = UUID.randomUUID().toString().split("-")[3].toUpperCase();
+			final String res = InetAddress.getLocalHost().getHostName().substring(0, 3).toUpperCase();
+			final StringBuilder bld = new StringBuilder(res.replace("-", ""));
 			bld.append("-");
 			bld.append(suffix);
 
 			return bld.toString();
-		} catch (UnknownHostException e) {
+		} catch (final UnknownHostException e) {
 			return null;
 		}
 	}
 
 	public static double dmsToDeg(double dms) {
-		double absDms = Math.abs(dms);
-		double d = Math.floor(absDms);
-		double m = (absDms - d) * 100 / 60;
+		final double absDms = Math.abs(dms);
+		final double d = Math.floor(absDms);
+		final double m = (absDms - d) * 100 / 60;
 		return (d + m);
 	}
 
 	public static double degToDms(double deg) {
-		double absDeg = Math.abs(deg);
-		double d = Math.floor(absDeg);
-		double m = (absDeg - d) * 60 / 100;
+		final double absDeg = Math.abs(deg);
+		final double d = Math.floor(absDeg);
+		final double m = (absDeg - d) * 60 / 100;
 		return (d + m);
 	}
 
-	public static enum Coordinate {
+	public enum Coordinate {
 		LAT, LON;
 	}
 
 	public static String degToIgc(double deg, Coordinate what) {
-		StringBuilder result = new StringBuilder();
+		final StringBuilder result = new StringBuilder();
 
 		char sign = 'S';
 		switch (what) {
@@ -112,7 +118,7 @@ public class AprsUtils {
 	public static double degToMeters(double deg) {
 		// Converts an angle (lon or lat) to meters.
 		// We assume a spherical Earth and being at the sea level.
-		double earthRadius = 6371 * 1000; // in meters
+		final double earthRadius = (double) 6371 * 1000; // in meters
 		return (deg * Math.PI * earthRadius / 180);
 	}
 
@@ -142,17 +148,17 @@ public class AprsUtils {
 	 * @return
 	 */
 	public static long toUtcTimestamp(String time) {
-		int h = Integer.parseInt(time.substring(0, 2));
-		int m = Integer.parseInt(time.substring(2, 4));
-		int s = Integer.parseInt(time.substring(4, 6));
+		final int h = Integer.parseInt(time.substring(0, 2));
+		final int m = Integer.parseInt(time.substring(2, 4));
+		final int s = Integer.parseInt(time.substring(4, 6));
 
 		return toUtcTimestamp(h, m, s);
 	}
 
 	public static long toUtcTimestamp(LocalDate date, String time) {
-		int h = Integer.parseInt(time.substring(0, 2));
-		int m = Integer.parseInt(time.substring(2, 4));
-		int s = Integer.parseInt(time.substring(4, 6));
+		final int h = Integer.parseInt(time.substring(0, 2));
+		final int m = Integer.parseInt(time.substring(2, 4));
+		final int s = Integer.parseInt(time.substring(4, 6));
 
 		return toUtcTimestamp(date, h, m, s);
 	}
@@ -175,13 +181,12 @@ public class AprsUtils {
 	 * @return a distance in m
 	 */
 	public static double calcDistance(double degLat1, double degLon1, double degLat2, double degLon2) {
-		final int RADIUS = 6371000;
 
-		double radLat1 = degLat1 * Math.PI / 180;
-		double radLon1 = degLon1 * Math.PI / 180;
+		final double radLat1 = degLat1 * Math.PI / 180;
+		final double radLon1 = degLon1 * Math.PI / 180;
 
-		double radLat2 = degLat2 * Math.PI / 180;
-		double radLon2 = degLon2 * Math.PI / 180;
+		final double radLat2 = degLat2 * Math.PI / 180;
+		final double radLon2 = degLon2 * Math.PI / 180;
 
 		return acos(sin(radLat1) * sin(radLat2) + cos(radLat1) * cos(radLat2) * cos(radLon2 - radLon1)) * RADIUS;
 	}

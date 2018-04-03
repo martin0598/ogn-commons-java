@@ -10,16 +10,12 @@ import org.ogn.commons.beacon.OgnBeacon;
 import org.ogn.commons.beacon.ReceiverBeacon;
 import org.ogn.commons.beacon.impl.OgnBeaconImpl;
 import org.ogn.commons.utils.Version;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.code.regexp.Matcher;
 
 public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon, Serializable {
 
 	private static final long serialVersionUID = 2851952572220758613L;
-
-	private static final Logger LOG = LoggerFactory.getLogger(AprsReceiverBeacon.class);
 
 	/**
 	 * name of the server receiving the packet
@@ -42,8 +38,7 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
 	protected float cpuLoad;
 
 	/**
-	 * CPU temperature of the board (in deg C) or <code>Float.NaN</code> if not
-	 * set
+	 * CPU temperature of the board (in deg C) or <code>Float.NaN</code> if not set
 	 */
 	protected float cpuTemp = Float.NaN;
 
@@ -81,7 +76,6 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
 	 * receiver's input noise (in dB)
 	 */
 	protected float recInputNoise;
-
 
 	@Override
 	public float getCpuLoad() {
@@ -190,7 +184,7 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		AprsReceiverBeacon other = (AprsReceiverBeacon) obj;
+		final AprsReceiverBeacon other = (AprsReceiverBeacon) obj;
 		if (Float.floatToIntBits(cpuLoad) != Float.floatToIntBits(other.cpuLoad))
 			return false;
 		if (Float.floatToIntBits(cpuTemp) != Float.floatToIntBits(other.cpuTemp))
@@ -223,22 +217,28 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
 		this.cpuLoad = Float.parseFloat(receiverMatcher.group("cpuLoad"));
 		this.freeRam = Float.parseFloat(receiverMatcher.group("ramFree"));
 		this.totalRam = Float.parseFloat(receiverMatcher.group("ramTotal"));
-		
-		this.ntpError = receiverMatcher.group("ntpOffset") == null ? 0 : Float.parseFloat(receiverMatcher.group("ntpOffset"));
-		this.rtCrystalCorrection = receiverMatcher.group("ntpCorrection") == null ? 0 : Float.parseFloat(receiverMatcher.group("ntpCorrection"));
-		//receiverMatcher.group("voltage");
-		//receiverMatcher.group("amperage");
-		this.cpuTemp = receiverMatcher.group("cpuTemperature") == null ? 0 : Float.parseFloat(receiverMatcher.group("cpuTemperature"));
-		//receiverMatcher.group("visibleSenders");
-		//receiverMatcher.group("senders");
-		this.recCrystalCorrection = receiverMatcher.group("rfCorrectionManual") == null ? 0 : Integer.parseInt(receiverMatcher.group("rfCorrectionManual"));
-		this.recCrystalCorrectionFine = receiverMatcher.group("rfCorrectionAutomatic") == null ? 0 : Float.parseFloat(receiverMatcher.group("rfCorrectionAutomatic"));
-		this.recInputNoise = receiverMatcher.group("signalQuality") == null ? 0 : Float.parseFloat(receiverMatcher.group("signalQuality"));
-		/*receiverMatcher.group("sendersSignalQuality");
-		receiverMatcher.group("sendersMessages");
-		receiverMatcher.group("goodSendersSignalQuality");
-		receiverMatcher.group("goodSenders");
-		receiverMatcher.group("goodAndBadSenders");*/
+
+		this.ntpError = receiverMatcher.group("ntpOffset") == null ? 0
+				: Float.parseFloat(receiverMatcher.group("ntpOffset"));
+		this.rtCrystalCorrection = receiverMatcher.group("ntpCorrection") == null ? 0
+				: Float.parseFloat(receiverMatcher.group("ntpCorrection"));
+		// receiverMatcher.group("voltage");
+		// receiverMatcher.group("amperage");
+		this.cpuTemp = receiverMatcher.group("cpuTemperature") == null ? 0
+				: Float.parseFloat(receiverMatcher.group("cpuTemperature"));
+		// receiverMatcher.group("visibleSenders");
+		// receiverMatcher.group("senders");
+		this.recCrystalCorrection = receiverMatcher.group("rfCorrectionManual") == null ? 0
+				: Integer.parseInt(receiverMatcher.group("rfCorrectionManual"));
+		this.recCrystalCorrectionFine = receiverMatcher.group("rfCorrectionAutomatic") == null ? 0
+				: Float.parseFloat(receiverMatcher.group("rfCorrectionAutomatic"));
+		this.recInputNoise = receiverMatcher.group("signalQuality") == null ? 0
+				: Float.parseFloat(receiverMatcher.group("signalQuality"));
+		/*
+		 * receiverMatcher.group("sendersSignalQuality"); receiverMatcher.group("sendersMessages");
+		 * receiverMatcher.group("goodSendersSignalQuality"); receiverMatcher.group("goodSenders");
+		 * receiverMatcher.group("goodAndBadSenders");
+		 */
 		return this;
 	}
 }

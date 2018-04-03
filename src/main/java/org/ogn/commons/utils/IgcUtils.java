@@ -12,6 +12,10 @@ import org.ogn.commons.beacon.AircraftDescriptor;
 
 public class IgcUtils {
 
+	private IgcUtils() {
+
+	}
+
 	/**
 	 * utility method preparing identifiers used for IGC log file naming
 	 * 
@@ -20,7 +24,7 @@ public class IgcUtils {
 	 * @return
 	 */
 	public static String toIgcLogFileId(final AircraftBeacon beacon, final Optional<AircraftDescriptor> descriptor) {
-		StringBuilder id = new StringBuilder(beacon.getId());
+		final StringBuilder id = new StringBuilder(beacon.getId());
 		if (descriptor.isPresent()) {
 
 			// \/:*?"<>|

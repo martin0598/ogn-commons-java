@@ -20,6 +20,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  */
 public class JsonUtils {
 
+	private JsonUtils() {
+
+	}
+
 	private static ObjectMapper objectMapper;
 
 	private static final Logger LOG = LoggerFactory.getLogger(JsonUtils.class);
@@ -36,7 +40,7 @@ public class JsonUtils {
 	public static <T> T fromJson(final String json, Class<T> clazz) {
 		try {
 			return getObjectMapper().readValue(new ByteArrayInputStream(json.getBytes()), clazz);
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			LOG.error("deserialization from JSON failed", ex);
 		}
 		return null;
@@ -45,12 +49,12 @@ public class JsonUtils {
 	public static String toJson(Object obj) {
 		String result = null;
 
-		StringWriter str = new StringWriter();
+		final StringWriter str = new StringWriter();
 
 		try {
 			getObjectMapper().writeValue(str, obj);
 			result = str.toString();
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			LOG.error("serialization to JSON failed", ex);
 		}
 

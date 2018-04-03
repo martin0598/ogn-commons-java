@@ -26,7 +26,7 @@ public class FileDbDescriptorProvider<T extends FileDb> implements AircraftDescr
 	private T db;
 	private ScheduledExecutorService scheduledExecutor;
 
-	private static Logger LOG = LoggerFactory.getLogger(FileDbDescriptorProvider.class);
+	private static final Logger LOG = LoggerFactory.getLogger(FileDbDescriptorProvider.class);
 
 	// default refresh rate (in sec.)
 	private static final int DEFAULT_DB_INTERVAL = 60 * 60;
@@ -49,15 +49,9 @@ public class FileDbDescriptorProvider<T extends FileDb> implements AircraftDescr
 
 		scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
 
-		scheduledExecutor.scheduleAtFixedRate(new Runnable() {
-
-			@Override
-			public void run() {
-
-				LOG.debug("reloading db {}", db.getClass().getName());
-				db.reload();
-
-			}
+		scheduledExecutor.scheduleAtFixedRate(() -> {
+			LOG.debug("reloading db {}", db.getClass().getName());
+			db.reload();
 		}, dbRefreshInterval, dbRefreshInterval, TimeUnit.SECONDS);
 
 	}

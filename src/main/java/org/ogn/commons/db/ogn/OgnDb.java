@@ -15,7 +15,7 @@ public class OgnDb extends FileDb {
 
 	private static final Logger LOG = LoggerFactory.getLogger(OgnDb.class);
 
-	private static final String DEFAULT_DEVICES_DB_URL = "http://ddb.glidernet.org/download";
+	private static final String DEFAULT_DEVICES_DB_URL = "http://ddb.glidernet.org/download/";
 
 	private static final String DELIMITER = ",";
 	private static final String COMMENT = "#";

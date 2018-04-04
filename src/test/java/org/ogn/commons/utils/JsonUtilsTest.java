@@ -5,11 +5,17 @@
 package org.ogn.commons.utils;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Optional;
 
 import org.junit.Test;
 import org.ogn.commons.beacon.AircraftBeacon;
+import org.ogn.commons.beacon.AircraftBeaconWithDescriptor;
+import org.ogn.commons.beacon.impl.AircraftDescriptorImpl;
 import org.ogn.commons.beacon.impl.aprs.AprsAircraftBeacon;
 import org.ogn.commons.beacon.impl.aprs.AprsLineParser;
 
@@ -42,5 +48,27 @@ public class JsonUtilsTest {
 
 		assertEquals(beacon, beacon2);
 		assertNotSame(beacon, beacon2);
+	}
+
+	@Test
+	public void test2() {
+		final String aprsSentence = "FLRDD9350>APRS,qAS,EHHO:/102537h5243.82N/00631.41E'/A=000026 id06DD9350 +020fpm +0.0rot 33.8dB 0e +3.0kHz gps3x3 hear8222 hear82AC";
+		final AircraftBeacon beacon = (AircraftBeacon) parser.parse(aprsSentence);
+
+		AircraftBeaconWithDescriptor beaconWithDescr = new AircraftBeaconWithDescriptor(beacon, Optional.empty());
+
+		AircraftBeaconWithDescriptor beaconWithDescr2 = JsonUtils.fromJson(JsonUtils.toJson(beaconWithDescr),
+				AircraftBeaconWithDescriptor.class);
+
+		assertFalse(beaconWithDescr.getDescriptor().isPresent());
+		assertEquals(beaconWithDescr, beaconWithDescr2);
+
+		beaconWithDescr = new AircraftBeaconWithDescriptor(beacon,
+				Optional.of(new AircraftDescriptorImpl("F-ABC", "XY", "Cirrus75", true, true)));
+
+		beaconWithDescr2 = JsonUtils.fromJson(JsonUtils.toJson(beaconWithDescr), AircraftBeaconWithDescriptor.class);
+
+		assertTrue(beaconWithDescr2.getDescriptor().isPresent());
+		assertEquals(beaconWithDescr, beaconWithDescr2);
 	}
 }

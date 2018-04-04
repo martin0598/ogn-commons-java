@@ -45,8 +45,8 @@ public class OgnBeaconImpl implements OgnBeacon, Serializable {
 	protected OgnBeaconImpl() {
 	}
 
-	public OgnBeaconImpl(String rawPacket, String id, long timestamp, double latitude, double longitude,
-			float altitude, int track, float groundSpeed) {
+	public OgnBeaconImpl(String rawPacket, String id, long timestamp, double latitude, double longitude, float altitude,
+			int track, float groundSpeed) {
 		this.rawPacket = rawPacket;
 		this.id = id;
 		this.timestamp = timestamp;
@@ -59,36 +59,39 @@ public class OgnBeaconImpl implements OgnBeacon, Serializable {
 
 	public OgnBeaconImpl(Matcher matcher) {
 		this.rawPacket = matcher.group(0);
-		
+
 		// APRS status and position fields
 		this.id = matcher.group("callsign");
-		//this.dstcall = matcher.group("dstcall");
-		//this.srvName = matcher.group("receiver");
+		// this.dstcall = matcher.group("dstcall");
+		// this.srvName = matcher.group("receiver");
 		this.timestamp = toUtcTimestamp(matcher.group("time"));
-		
+
 		// if we have a APRS status, then we have just 5 groups
 		if (matcher.groupCount() == 5) {
 			return;
 		}
-		
+
 		// APRS position fields
 		this.lat = dmsToDeg(Double.parseDouble(matcher.group("latitude")) / 100);
-		this.lat += matcher.group("posExtension") == null ? 0 : Double.parseDouble(matcher.group("latitudeEnhancement")) / 1000 / 60;
+		this.lat += matcher.group("posExtension") == null ? 0
+				: Double.parseDouble(matcher.group("latitudeEnhancement")) / 1000 / 60;
 		if (matcher.group("latitudeSign").equals("S")) {
 			this.lat *= -1;
 		}
-		//matcher.group("symboltable");
+		// matcher.group("symboltable");
 		this.lon = dmsToDeg(Double.parseDouble(matcher.group("longitude")) / 100);
-		this.lon += matcher.group("posExtension") == null ? 0 : Double.parseDouble(matcher.group("longitudeEnhancement")) / 1000 / 60;
+		this.lon += matcher.group("posExtension") == null ? 0
+				: Double.parseDouble(matcher.group("longitudeEnhancement")) / 1000 / 60;
 		if (matcher.group("longitudeSign").equals("W")) {
 			this.lon *= -1;
 		}
-		//matcher.group("symbol");
+		// matcher.group("symbol");
 		matcher.group("courseExtension");
 		this.track = matcher.group("course") == null ? 0 : Integer.parseInt(matcher.group("course"));
-		this.groundSpeed = matcher.group("groundSpeed") == null ? 0 : kntToKmh(Float.parseFloat(matcher.group("groundSpeed")));
+		this.groundSpeed = matcher.group("groundSpeed") == null ? 0
+				: kntToKmh(Float.parseFloat(matcher.group("groundSpeed")));
 		this.alt = matcher.group("altitude") == null ? 0 : feetsToMetres(Float.parseFloat(matcher.group("altitude")));
-		//matcher.group("comment");
+		// matcher.group("comment");
 	}
 
 	@Override

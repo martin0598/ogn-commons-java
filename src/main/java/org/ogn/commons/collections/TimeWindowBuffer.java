@@ -10,12 +10,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * This class implements a moving-time-window buffer which holds elements as
- * long as one of the two conditions is met: 1) predefined amount of time (ms)
- * elapses or 2) the total string length of ALL elements concatenated together
- * (including the optional delimiters)exceeds the max. allowed number. In any
- * case listeners are notified with a string representation of the buffer (the
- * concatenated elements) and the buffer is flushed.
+ * This class implements a moving-time-window buffer which holds elements as long as one of the two conditions is met:
+ * 1) predefined amount of time (ms) elapses or 2) the total string length of ALL elements concatenated together
+ * (including the optional delimiters)exceeds the max. allowed number. In any case listeners are notified with a string
+ * representation of the buffer (the concatenated elements) and the buffer is flushed.
  * 
  * @author wbuczak
  * @param <T>
@@ -39,7 +37,7 @@ public class TimeWindowBuffer<T> extends ArrayList<T> {
 			super.add(obj);
 			if (this.size() >= maxSize)
 				evaluate();
-		}// sync
+		} // sync
 
 		return true;
 	}
@@ -63,8 +61,8 @@ public class TimeWindowBuffer<T> extends ArrayList<T> {
 					}
 					// clear the buffer
 					this.clear();
-				}// sync
-		}// sync
+				} // sync
+		} // sync
 	}
 
 	private String toStr() {
@@ -76,7 +74,7 @@ public class TimeWindowBuffer<T> extends ArrayList<T> {
 				if (++index < this.size() && delimiter != null)
 					strBld.append(delimiter);
 			}
-		}// sync
+		} // sync
 
 		return strBld.toString();
 	}
@@ -93,7 +91,8 @@ public class TimeWindowBuffer<T> extends ArrayList<T> {
 		this(maxSize, timeWindowMs, listeners, null);
 	}
 
-	public TimeWindowBuffer(int maxSize, long timeWindowMs, final TimeWindowBufferListener[] listeners, String delimiter) {
+	public TimeWindowBuffer(int maxSize, long timeWindowMs, final TimeWindowBufferListener[] listeners,
+			String delimiter) {
 		this.maxSize = maxSize;
 		this.timeWindow = timeWindowMs;
 		this.listeners = Arrays.copyOf(listeners, listeners.length);

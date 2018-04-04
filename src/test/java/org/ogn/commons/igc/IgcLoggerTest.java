@@ -109,7 +109,7 @@ public class IgcLoggerTest {
 
 		int i = 0;
 		for (String aprsLine : aprsPhrases) {
-			AircraftBeacon beacon = (AprsAircraftBeacon)parser.parse(aprsLine);
+			AircraftBeacon beacon = (AprsAircraftBeacon) parser.parse(aprsLine);
 			logger.log(beacon, Optional.of(date), Optional.of(descriptors[i++]));
 		}
 

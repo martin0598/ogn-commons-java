@@ -10,9 +10,8 @@ package org.ogn.commons.beacon;
 public interface OgnBeacon {
 
 	/**
-	 * @return packet identifier (in case of receivers - name of the receiver,
-	 *         in case of aircraft beacons - it can be reg. number (resolved by
-	 *         the receiver) or tracker address
+	 * @return packet identifier (in case of receivers - name of the receiver, in case of aircraft beacons - it can be
+	 *         reg. number (resolved by the receiver) or tracker address
 	 */
 	String getId();
 

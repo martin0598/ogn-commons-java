@@ -27,7 +27,7 @@ public class OgnDbDescriptorProviderTest {
 		Thread.sleep(1000);
 
 		Optional<AircraftDescriptor> desc = provider.findDescriptor("DD83CE");
-		assertTrue(desc.isPresent());		
+		assertTrue(desc.isPresent());
 
 		assertEquals("F-CLMT", desc.get().getRegNumber());
 

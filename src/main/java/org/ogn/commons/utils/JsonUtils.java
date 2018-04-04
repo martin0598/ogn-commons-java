@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 /**
  * Helper class providing JSON serialization & de-serialization utility methods
@@ -31,6 +32,7 @@ public class JsonUtils {
 	private static ObjectMapper getObjectMapper() {
 		if (objectMapper == null) {
 			objectMapper = new ObjectMapper();
+			objectMapper.registerModule(new Jdk8Module());
 			objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
 		}
 

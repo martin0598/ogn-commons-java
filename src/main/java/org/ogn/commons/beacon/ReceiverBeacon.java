@@ -7,14 +7,12 @@ package org.ogn.commons.beacon;
 public interface ReceiverBeacon extends OgnBeacon {
 
 	/**
-	 * @return CPU load (as indicated by the linux 'uptime' command) or
-	 *         <code>Float.NaN</code> if not set
+	 * @return CPU load (as indicated by the linux 'uptime' command) or <code>Float.NaN</code> if not set
 	 */
 	float getCpuLoad();
 
 	/**
-	 * @return CPU temperature of the board (in deg C) or <code>Float.NaN</code>
-	 *         if not set
+	 * @return CPU temperature of the board (in deg C) or <code>Float.NaN</code> if not set
 	 */
 	float getCpuTemp();
 
@@ -49,8 +47,8 @@ public interface ReceiverBeacon extends OgnBeacon {
 	float getRecCrystalCorrectionFine();
 
 	/**
-	 * @return receiver's absolute correction (as a result of: 'rec. crystal
-	 *         correction' + 'rec. correction fine') (in ppm)
+	 * @return receiver's absolute correction (as a result of: 'rec. crystal correction' + 'rec. correction fine') (in
+	 *         ppm)
 	 */
 	float getRecAbsCorrection();
 
@@ -71,14 +69,12 @@ public interface ReceiverBeacon extends OgnBeacon {
 
 	/**
 	 * 
-	 * @return information about the platform (e.g. RPI-GP, x86, ARM..) or null
-	 *         if not available
+	 * @return information about the platform (e.g. RPI-GP, x86, ARM..) or null if not available
 	 */
 	String getPlatform();
 
 	/**
-	 * @return numeric representation of the receiver's version or 0 (if version
-	 *         is not available)
+	 * @return numeric representation of the receiver's version or 0 (if version is not available)
 	 */
 	int getNumericVersion();
 }

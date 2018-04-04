@@ -10,8 +10,7 @@ import org.ogn.commons.beacon.AircraftBeacon;
 import org.ogn.commons.beacon.AircraftDescriptor;
 
 /**
- * this interface is to be implemented by these ogn gateway plugins who want to
- * receive aircraft beacon updates
+ * this interface is to be implemented by these ogn gateway plugins who want to receive aircraft beacon updates
  * 
  * @author wbuczak
  */

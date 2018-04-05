@@ -10,6 +10,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.PostConstruct;
+
 import org.ogn.commons.beacon.AircraftDescriptor;
 import org.ogn.commons.beacon.descriptor.AircraftDescriptorProvider;
 import org.slf4j.Logger;
@@ -23,21 +25,20 @@ import org.slf4j.LoggerFactory;
  */
 public class FileDbDescriptorProvider<T extends FileDb> implements AircraftDescriptorProvider {
 
+	private static final Logger LOG = LoggerFactory.getLogger(FileDbDescriptorProvider.class);
+
 	private T db;
 	private ScheduledExecutorService scheduledExecutor;
 
-	private static final Logger LOG = LoggerFactory.getLogger(FileDbDescriptorProvider.class);
+	private final int dbRefreshInterval;
 
 	// default refresh rate (in sec.)
 	private static final int DEFAULT_DB_INTERVAL = 60 * 60;
 
 	public FileDbDescriptorProvider(Class<T> clazz, String dbFileUri, int dbRefreshInterval) {
-
+		this.dbRefreshInterval = dbRefreshInterval;
 		try {
 			db = clazz.getConstructor(String.class).newInstance(dbFileUri);
-			LOG.info(
-					"creating and initializing desciptor privider with parameters: uri: {}, refresh-interval: {} class: {}",
-					db.getUrl(), dbRefreshInterval, clazz.getCanonicalName());
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
 			LOG.error("instantiation of descriptor provider failed!", e);
@@ -62,6 +63,12 @@ public class FileDbDescriptorProvider<T extends FileDb> implements AircraftDescr
 
 	public FileDbDescriptorProvider(Class<T> clazz) {
 		this(clazz, null, DEFAULT_DB_INTERVAL);
+	}
+
+	@PostConstruct
+	private void logConf() {
+		LOG.info("created aircraft desciptor privider [uri: {}, refresh-interval: {} s, class: {}]", db.getUrl(),
+				dbRefreshInterval, db.getClass().getCanonicalName());
 	}
 
 	@Override

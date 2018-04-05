@@ -19,6 +19,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import javax.annotation.PostConstruct;
+
 import org.ogn.commons.beacon.AircraftBeacon;
 import org.ogn.commons.beacon.AircraftDescriptor;
 import org.ogn.commons.utils.AprsUtils;
@@ -92,12 +94,16 @@ public class IgcLogger {
 		}
 	}
 
+	@PostConstruct
+	private void logConf() {
+		LOG.info("created igc logger [log-folder: {}, mode: {}]", igcBaseDir, workingMode);
+	}
+
 	public IgcLogger(Mode mode) {
 		this(DEFAULT_IGC_BASE_DIR, mode);
 	}
 
 	public IgcLogger(final String logsFolder, Mode mode) {
-		LOG.info("creating igc logger [log-folder: {}, mode: {}]", logsFolder, mode);
 		igcBaseDir = logsFolder;
 		workingMode = mode;
 

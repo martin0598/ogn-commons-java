@@ -5,6 +5,7 @@
 package org.ogn.commons.beacon.impl.aprs;
 
 import org.ogn.commons.beacon.OgnBeacon;
+import org.ogn.commons.beacon.ReceiverBeaconType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,14 +50,15 @@ public class AprsLineParser {
 			final Matcher receiverMatcher = ognReceiverPattern.matcher(comment);
 			if (receiverMatcher.matches()) {
 				LOG.debug("Receiver status beacon: {}", aprsLine);
-				result = new AprsReceiverBeacon(statusMatcher).update(receiverMatcher);
+				result = new AprsReceiverBeacon(statusMatcher, ReceiverBeaconType.RECEIVER_STATUS)
+						.update(receiverMatcher);
 			}
 			// Check if we have a APRS position
 		} else if (positionMatcher.matches()) {
 			final String comment = positionMatcher.group("comment");
 			if (processReceiverBeacons && comment == null) {
 				LOG.debug("Receiver position beacon without comment: {}", aprsLine);
-				result = new AprsReceiverBeacon(positionMatcher);
+				result = new AprsReceiverBeacon(positionMatcher, ReceiverBeaconType.RECEIVER_POSITION);
 			} else {
 				final Matcher aircraftMatcher = ognAircraftPattern.matcher(comment);
 				if (processAircraftBeacons && aircraftMatcher.matches()) {
@@ -67,7 +69,8 @@ public class AprsLineParser {
 				final Matcher receiverMatcher = ognReceiverPattern.matcher(comment);
 				if (processReceiverBeacons && receiverMatcher.matches()) {
 					LOG.debug("Receiver position beacon: {}", aprsLine);
-					result = new AprsReceiverBeacon(positionMatcher).update(receiverMatcher);
+					result = new AprsReceiverBeacon(positionMatcher, ReceiverBeaconType.RECEIVER_POSITION)
+							.update(receiverMatcher);
 				}
 			}
 		}

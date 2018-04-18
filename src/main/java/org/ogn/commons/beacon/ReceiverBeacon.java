@@ -7,6 +7,12 @@ package org.ogn.commons.beacon;
 public interface ReceiverBeacon extends OgnBeacon {
 
 	/**
+	 * 
+	 * @return type of Receiver Beacon (Status vs Position beacon)
+	 */
+	ReceiverBeaconType getReceiverBeaconType();
+
+	/**
 	 * @return CPU load (as indicated by the linux 'uptime' command) or <code>Float.NaN</code> if not set
 	 */
 	float getCpuLoad();

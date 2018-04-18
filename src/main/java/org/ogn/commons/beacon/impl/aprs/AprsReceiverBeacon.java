@@ -8,6 +8,7 @@ import java.io.Serializable;
 
 import org.ogn.commons.beacon.OgnBeacon;
 import org.ogn.commons.beacon.ReceiverBeacon;
+import org.ogn.commons.beacon.ReceiverBeaconType;
 import org.ogn.commons.beacon.impl.OgnBeaconImpl;
 import org.ogn.commons.utils.Version;
 
@@ -16,6 +17,8 @@ import com.google.code.regexp.Matcher;
 public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon, Serializable {
 
 	private static final long serialVersionUID = 2851952572220758613L;
+
+	protected ReceiverBeaconType type;
 
 	/**
 	 * name of the server receiving the packet
@@ -154,9 +157,10 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
 		// no default implementation
 	}
 
-	public AprsReceiverBeacon(Matcher matcher) {
+	public AprsReceiverBeacon(Matcher matcher, ReceiverBeaconType type) {
 		super(matcher);
 		this.srvName = matcher.group("receiver");
+		this.type = type;
 	}
 
 	@Override
@@ -174,6 +178,11 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
 		result = prime * result + ((srvName == null) ? 0 : srvName.hashCode());
 		result = prime * result + Float.floatToIntBits(totalRam);
 		return result;
+	}
+
+	@Override
+	public ReceiverBeaconType getReceiverBeaconType() {
+		return this.type;
 	}
 
 	@Override
@@ -241,4 +250,5 @@ public class AprsReceiverBeacon extends OgnBeaconImpl implements ReceiverBeacon,
 		 */
 		return this;
 	}
+
 }

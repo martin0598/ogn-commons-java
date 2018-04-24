@@ -24,6 +24,7 @@ import org.ogn.commons.beacon.AircraftBeacon;
 import org.ogn.commons.beacon.AircraftType;
 import org.ogn.commons.beacon.OgnBeacon;
 import org.ogn.commons.beacon.ReceiverBeacon;
+import org.ogn.commons.beacon.ReceiverBeaconType;
 import org.ogn.commons.beacon.impl.aprs.AprsLineParser;
 
 public class OgnBeaconImplTest {
@@ -50,16 +51,26 @@ public class OgnBeaconImplTest {
 		Assert.assertEquals(0, beacon1.getRecCrystalCorrection());
 		Assert.assertEquals(0.0, beacon1.getRecCrystalCorrectionFine(), 0.01);
 		Assert.assertEquals(1.32, beacon1.getRecInputNoise(), 0.01);
+		Assert.assertEquals(ReceiverBeaconType.RECEIVER_POSITION, beacon1.getReceiverBeaconType());
 
 		// APRS STATUS
 		final ReceiverBeacon beacon2 = (ReceiverBeacon) parser.parse(
 				"VITACURA2>APRS,TCPIP*,qAC,GLIDERN3:>042136h v0.2.5.ARM CPU:0.3 RAM:695.0/970.5MB NTP:0.6ms/-5.7ppm +52.1C 0/0Acfts[1h] RF:+0-0.0ppm/+1.32dB/+2.1dB@10km[193897]/+9.0dB@10km[10/20]");
 		Assert.assertEquals(52.1, beacon2.getCpuTemp(), 0.01);
+
+		final ReceiverBeacon beacon3 = (ReceiverBeacon) parser
+				.parse("Albertvil>APRS,TCPIP*,qAC,GLIDERN2:/153724h4539.76NI00620.80E&/A=001246");
+		Assert.assertEquals(ReceiverBeaconType.RECEIVER_POSITION, beacon3.getReceiverBeaconType());
+
+		final ReceiverBeacon beacon4 = (ReceiverBeacon) parser.parse(
+				"Albertvil>APRS,TCPIP*,qAC,GLIDERN2:>153724h v0.2.6.ARM CPU:0.8 RAM:856.8/1017.6MB NTP:1.7ms/-70.8ppm 0.000V 0.000A +55.4C 2/2Acfts[1h] RF:+50+10.6ppm/+0.70dB/+8.5dB@10km[143539]/+7.9dB@10km[12/23]");
+		Assert.assertEquals(ReceiverBeaconType.RECEIVER_STATUS, beacon4.getReceiverBeaconType());
+
 	}
 
 	@Test
 	public void test_AircraftBeacon() {
-		final AircraftBeacon beacon = (AircraftBeacon) parser.parse(
+		AircraftBeacon beacon = (AircraftBeacon) parser.parse(
 				"ZK-GSC>APRS,qAS,Omarama:/165202h4429.25S/16959.33E'/A=001407 id05C821EA +020fpm +0.0rot 16.8dB 0e -3.1kHz gps1x3 hear1084 hearB597 hearB598");
 		Assert.assertEquals("ZK-GSC", beacon.getId());
 		Assert.assertEquals("Omarama", beacon.getReceiverName());
@@ -82,6 +93,17 @@ public class OgnBeaconImplTest {
 		Assert.assertEquals("1084", beacon.getHeardAircraftIds()[0]);
 		Assert.assertEquals("B597", beacon.getHeardAircraftIds()[1]);
 		Assert.assertEquals("B598", beacon.getHeardAircraftIds()[2]);
+
+		beacon = (AircraftBeacon) parser.parse(
+				"OGN202E5D>APRS,qAS,LHGD:/150342h4749.47N/01939.42E'303/064/A=001617 !W29! id0B202E5D -157fpm -0.9rot 0.8dB 9e -5.2kHz gps2x3");
+		Assert.assertEquals(AddressType.OGN, beacon.getAddressType());
+
+		// TODO: fix, currently we don't recognize these addresses as FANET
+		// beacon received from FANET
+		// beacon = (AircraftBeacon) parser.parse(
+		// "FNTFF00BD>OGNFNT,qAS,FNBFF00BD:/182547h3820.71N/00028.78Wg295/000/A=000043 !W74! id1FFF00BD -01fpm");
+		// Assert.assertEquals(AddressType.UNRECOGNIZED, beacon.getAddressType());
+
 	}
 
 	@Test

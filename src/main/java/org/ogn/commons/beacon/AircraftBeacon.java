@@ -88,7 +88,13 @@ public interface AircraftBeacon extends OgnBeacon {
 	 * @return estimated effective radiated power of the transmitter
 	 */
 	float getERP();
-
+	
+	
+    /**
+	 *  returns barometric preasure altitude (if baro sensor is present in the device)
+	 *  eg. FL051.23 means 5123feet pressure altitude in standard atmosphere.
+	 *
+	 */	
 	float getFlightLevel();
 
 }

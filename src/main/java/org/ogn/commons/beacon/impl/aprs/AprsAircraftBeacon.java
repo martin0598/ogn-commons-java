@@ -54,6 +54,11 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 	protected boolean stealth;
 
 	/**
+	 * beacon relayed or not
+	 */
+	protected boolean relayed;
+
+	/**
 	 * climb rate in m/s
 	 */
 	protected float climbRate;
@@ -149,6 +154,11 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 	}
 
 	@Override
+	public boolean isRelayed() {
+		return relayed;
+	}
+
+	@Override
 	public float getClimbRate() {
 		return climbRate;
 	}
@@ -211,8 +221,13 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 	}
 
 	public AprsAircraftBeacon(Matcher positionMatcher) {
+		this(positionMatcher, false);
+	}
+
+	public AprsAircraftBeacon(Matcher positionMatcher, boolean isRelayed) {
 		super(positionMatcher);
 		this.receiverName = positionMatcher.group("receiver");
+		this.relayed = isRelayed;
 	}
 
 	@Override
@@ -328,4 +343,5 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 				: new TreeSet<>(Arrays.asList(aircraftMatcher.group("proximity").substring(4).split(" hear")));
 		return this;
 	}
+
 }

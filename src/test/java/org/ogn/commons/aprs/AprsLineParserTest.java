@@ -54,6 +54,7 @@ public class AprsLineParserTest {
 		String acBeacon2 = "OGNFFDE83>APRS,RELAY*,qAS,Aue:/053527h9140.49S/06801.07Ez073/173/A=071668 !W15! id03FFDE83 -8592fpm -0.3rot FL708.76 gps32x47";
 		beacon = parser.parse(acBeacon2);
 		assertNotNull(beacon);
+		assertTrue(((AircraftBeacon) beacon).isRelayed());
 
 		acBeacon2 = "FLRDDDDD6>APRS,qAS,Aue:/053615h5138.02N/01015.55E'000/000/A=000266 !W30! id06DDDDD6 -157fpm +0.0rot 28.8dB 0e +4.9kHz gps18x21 s6.09 h0A";
 

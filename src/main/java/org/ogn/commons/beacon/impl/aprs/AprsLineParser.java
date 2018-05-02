@@ -20,6 +20,8 @@ public class AprsLineParser {
 	private static Pattern ognAircraftPattern = Pattern.compile(AprsPatternConstants.PATTERN_AIRCRAFT_BEACON);
 	private static Pattern ognReceiverPattern = Pattern.compile(AprsPatternConstants.PATTERN_RECEIVER_BEACON);
 
+	private static final String RELAY_BEACON_TOCKEN = "RELAY";
+
 	private static final Logger LOG = LoggerFactory.getLogger(AprsLineParser.class);
 
 	private static class AprsLineParserHolder {
@@ -63,7 +65,10 @@ public class AprsLineParser {
 				final Matcher aircraftMatcher = ognAircraftPattern.matcher(comment);
 				if (processAircraftBeacons && aircraftMatcher.matches()) {
 					LOG.debug("Aircraft position beacon: {}", aprsLine);
-					result = new AprsAircraftBeacon(positionMatcher).update(aircraftMatcher);
+					boolean isRelayed = false;
+					if (aprsLine.substring(15, 20).equals(RELAY_BEACON_TOCKEN))
+						isRelayed = true;
+					result = new AprsAircraftBeacon(positionMatcher, isRelayed).update(aircraftMatcher);
 				}
 
 				final Matcher receiverMatcher = ognReceiverPattern.matcher(comment);

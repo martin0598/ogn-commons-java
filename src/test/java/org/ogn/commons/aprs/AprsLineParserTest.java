@@ -6,7 +6,6 @@ package org.ogn.commons.aprs;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
@@ -38,23 +37,20 @@ public class AprsLineParserTest {
 		assertNotNull(beacon);
 		assertTrue(beacon instanceof AircraftBeacon);
 
-		// ignore aircraft beacons
-		beacon = parser.parse(acBeacon1, false, true);
-		assertNull(beacon);
-
 		beacon = parser.parse(brBeacon1);
 
 		assertNotNull(beacon);
 		assertTrue(beacon instanceof ReceiverBeacon);
 
-		// ignore receiver beacons
-		beacon = parser.parse(brBeacon1, true, false);
-		assertNull(beacon);
-
 		String acBeacon2 = "OGNFFDE83>APRS,RELAY*,qAS,Aue:/053527h9140.49S/06801.07Ez073/173/A=071668 !W15! id03FFDE83 -8592fpm -0.3rot FL708.76 gps32x47";
 		beacon = parser.parse(acBeacon2);
 		assertNotNull(beacon);
 		assertTrue(((AircraftBeacon) beacon).isRelayed());
+
+		acBeacon2 = "FLRDDFA6D>APRS,OGN035E35*,qAS,TROCALAN1:/190720h3328.95S/07029.03W'313/076/A=008364 !W77! id06DDFA6D +198fpm +0.0rot 10.2dB 0e -2.2kHz gps3x5";
+		beacon = parser.parse(acBeacon2);
+		assertNotNull(beacon);
+		// assertTrue(((AircraftBeacon) beacon).isRelayed());
 
 		acBeacon2 = "FLRDDDDD6>APRS,qAS,Aue:/053615h5138.02N/01015.55E'000/000/A=000266 !W30! id06DDDDD6 -157fpm +0.0rot 28.8dB 0e +4.9kHz gps18x21 s6.09 h0A";
 
@@ -79,6 +75,19 @@ public class AprsLineParserTest {
 
 		assertNotNull(beacon);
 		assertTrue(beacon instanceof ReceiverBeacon);
+
+		final String pawBeacon = "PAW72C3AA>APRS,qAS,PWEGBW:/191413h5211.46N\\00137.10Wn000/000/A=000157 !W89! id3F72C3AA +000fpm +0.0rot 20.0dB 0e -6.0kHz gps1x1";
+		beacon = parser.parse(pawBeacon);
+
+		assertNotNull(beacon);
+		assertTrue(beacon instanceof AircraftBeacon);
+
+		final String recPosBeacon2 = "PWRadley>APRS,TCPIP*,qAC,GLIDERN2:/191448h5141.07NI00114.70W&/A=000220";
+		beacon = parser.parse(recPosBeacon2);
+
+		assertNotNull(beacon);
+		assertTrue(beacon instanceof ReceiverBeacon);
+
 	}
 
 	@Test

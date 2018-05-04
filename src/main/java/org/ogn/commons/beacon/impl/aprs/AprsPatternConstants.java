@@ -8,7 +8,7 @@ public interface AprsPatternConstants {
 	 * camelCase)
 	 */
 
-	String PATTERN_APRS_POSITION = "^(?<callsign>.+?)>(?<dstcall>[A-Z0-9]+),.+,(?<receiver>.+?):/(?<time>\\d{6})+h(?<latitude>\\d{4}\\.\\d{2})(?<latitudeSign>N|S)(?<symboltable>.)(?<longitude>\\d{5}\\.\\d{2})(?<longitudeSign>E|W)(?<symbol>.)(?<courseExtension>(?<course>\\d{3})/(?<groundSpeed>\\d{3}))?/A=(?<altitude>\\d{6})(?<posExtension>\\s!W((?<latitudeEnhancement>\\d)(?<longitudeEnhancement>\\d))!)?(?:\\s(?<comment>.*))?$";
+	String PATTERN_APRS_POSITION = "^(?<callsign>.+?)>(?<dstcall>[A-Z0-9]+),((?<relay>[A-Za-z0-9]+)\\*)?.*,(?<receiver>.+?):/(?<time>\\d{6})+h(?<latitude>\\d{4}\\.\\d{2})(?<latitudeSign>N|S)(?<symboltable>.)(?<longitude>\\d{5}\\.\\d{2})(?<longitudeSign>E|W)(?<symbol>.)(?<courseExtension>(?<course>\\d{3})/(?<groundSpeed>\\d{3}))?/A=(?<altitude>\\d{6})(?<posExtension>\\s!W((?<latitudeEnhancement>\\d)(?<longitudeEnhancement>\\d))!)?(?:\\s(?<comment>.*))?$";
 	String PATTERN_APRS_STATUS = "(?<callsign>.+?)>(?<dstcall>[A-Z0-9]+),.+,(?<receiver>.+?):>(?<time>\\d{6})+h\\s(?<comment>.*)$";
 
 	/*
@@ -33,4 +33,5 @@ public interface AprsPatternConstants {
 			+ "(?:gps(?<gpsAccuracy>\\d+x\\d+)\\s?)?" + "(?:s(?<flarmSoftwareVersion>[\\d.]+)\\s?)?"
 			+ "(?:h(?<flarmHardwareVersion>[\\dA-F]{2})\\s?)?" + "(?:r(?<flarmId>[\\dA-F]+)\\s?)?"
 			+ "(?:(?<signalPower>[+-][\\d.]+)dBm\\s?)?" + "(?:(?<proximity>(hear[\\dA-F]{4}\\s?)+))?";
+
 }

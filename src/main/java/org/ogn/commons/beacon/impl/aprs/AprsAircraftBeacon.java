@@ -227,7 +227,7 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 	public AprsAircraftBeacon(Matcher positionMatcher, boolean isRelayed) {
 		super(positionMatcher);
 		this.receiverName = positionMatcher.group("receiver");
-		this.relayed = isRelayed;
+		this.relayed = null != positionMatcher.group("relay");
 	}
 
 	@Override
@@ -306,6 +306,8 @@ public class AprsAircraftBeacon extends OgnBeaconImpl implements AircraftBeacon 
 		if (Float.floatToIntBits(signalStrength) != Float.floatToIntBits(other.signalStrength))
 			return false;
 		if (stealth != other.stealth)
+			return false;
+		if (relayed != other.relayed)
 			return false;
 		if (Float.floatToIntBits(turnRate) != Float.floatToIntBits(other.turnRate))
 			return false;

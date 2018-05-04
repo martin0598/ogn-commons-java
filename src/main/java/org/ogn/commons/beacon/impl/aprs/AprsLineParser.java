@@ -20,8 +20,6 @@ public class AprsLineParser {
 	private static Pattern ognAircraftPattern = Pattern.compile(AprsPatternConstants.PATTERN_AIRCRAFT_BEACON);
 	private static Pattern ognReceiverPattern = Pattern.compile(AprsPatternConstants.PATTERN_RECEIVER_BEACON);
 
-	private static final String RELAY_BEACON_TOCKEN = "RELAY";
-
 	private static final Logger LOG = LoggerFactory.getLogger(AprsLineParser.class);
 
 	private static class AprsLineParserHolder {
@@ -36,10 +34,6 @@ public class AprsLineParser {
 	}
 
 	public OgnBeacon parse(String aprsLine) {
-		return parse(aprsLine, true, true);
-	}
-
-	public OgnBeacon parse(String aprsLine, boolean processAircraftBeacons, boolean processReceiverBeacons) {
 		LOG.trace(aprsLine);
 		OgnBeacon result = null;
 
@@ -47,33 +41,31 @@ public class AprsLineParser {
 		final Matcher positionMatcher = aprsPositionPattern.matcher(aprsLine);
 
 		// Check if we have a APRS status
-		if (processReceiverBeacons && statusMatcher.matches()) {
+		if (statusMatcher.matches()) {
 			final String comment = statusMatcher.group("comment");
 			final Matcher receiverMatcher = ognReceiverPattern.matcher(comment);
 			if (receiverMatcher.matches()) {
-				LOG.debug("Receiver status beacon: {}", aprsLine);
+				LOG.trace("Receiver status beacon: {}", aprsLine);
 				result = new AprsReceiverBeacon(statusMatcher, ReceiverBeaconType.RECEIVER_STATUS)
 						.update(receiverMatcher);
 			}
 			// Check if we have a APRS position
 		} else if (positionMatcher.matches()) {
 			final String comment = positionMatcher.group("comment");
-			if (processReceiverBeacons && comment == null) {
-				LOG.debug("Receiver position beacon without comment: {}", aprsLine);
+			if (comment == null) {
+				LOG.trace("Receiver position beacon without comment: {}", aprsLine);
 				result = new AprsReceiverBeacon(positionMatcher, ReceiverBeaconType.RECEIVER_POSITION);
 			} else {
 				final Matcher aircraftMatcher = ognAircraftPattern.matcher(comment);
-				if (processAircraftBeacons && aircraftMatcher.matches()) {
-					LOG.debug("Aircraft position beacon: {}", aprsLine);
-					boolean isRelayed = false;
-					if (aprsLine.substring(15, 20).equals(RELAY_BEACON_TOCKEN))
-						isRelayed = true;
+				if (aircraftMatcher.matches()) {
+					LOG.trace("Aircraft position beacon: {}", aprsLine);
+					final boolean isRelayed = false;
 					result = new AprsAircraftBeacon(positionMatcher, isRelayed).update(aircraftMatcher);
 				}
 
 				final Matcher receiverMatcher = ognReceiverPattern.matcher(comment);
-				if (processReceiverBeacons && receiverMatcher.matches()) {
-					LOG.debug("Receiver position beacon: {}", aprsLine);
+				if (receiverMatcher.matches()) {
+					LOG.trace("Receiver position beacon: {}", aprsLine);
 					result = new AprsReceiverBeacon(positionMatcher, ReceiverBeaconType.RECEIVER_POSITION)
 							.update(receiverMatcher);
 				}

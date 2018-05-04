@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014-2015 OGN, All Rights Reserved.
+ * Copyright (c) 2014-2018 OGN, All Rights Reserved.
  */
 
 package org.ogn.commons.beacon.impl.aprs;
@@ -19,10 +19,10 @@ public class AprsReceiverBeaconTest {
 
 	@Test
 	public void testEqualsAndHashCode() {
-		String recBeacon = "EBZW>APRS,TCPIP*,qAC,GLIDERN1:/102546h5100.86NI00531.43E&/A=000298 CPU:0.9 RAM:968.2/1056.5MB NTP:1.5ms/-20.0ppm RF:+127-2.9ppm/+4.3dB";
+		final String recBeacon = "EBZW>APRS,TCPIP*,qAC,GLIDERN1:/102546h5100.86NI00531.43E&/A=000298 CPU:0.9 RAM:968.2/1056.5MB NTP:1.5ms/-20.0ppm RF:+127-2.9ppm/+4.3dB";
 
-		ReceiverBeacon b1 = (ReceiverBeacon) parser.parse(recBeacon);
-		ReceiverBeacon b2 = (ReceiverBeacon) parser.parse(recBeacon);
+		final ReceiverBeacon b1 = (ReceiverBeacon) parser.parse(recBeacon);
+		final ReceiverBeacon b2 = (ReceiverBeacon) parser.parse(recBeacon);
 
 		assertEquals(b1.hashCode(), b2.hashCode());
 		assertEquals(b1, b2);
@@ -32,9 +32,9 @@ public class AprsReceiverBeaconTest {
 	@Ignore
 	@Test
 	public void corrupted_beacon() {
-		String recBeacon = "incorrect > ! Cdd blah blah blah xxx beacon $$ format";
+		final String recBeacon = "incorrect > ! Cdd blah blah blah xxx beacon $$ format";
 
-		ReceiverBeacon b1 = (ReceiverBeacon) parser.parse(recBeacon);
+		final ReceiverBeacon b1 = (ReceiverBeacon) parser.parse(recBeacon);
 
 		assertEquals(recBeacon, b1.getRawPacket());
 
@@ -45,13 +45,13 @@ public class AprsReceiverBeaconTest {
 
 	@Test
 	public void test_fail_validation() {
-		ReceiverBeacon receiver_beacon = (ReceiverBeacon) parser.parse(validAprs + " notAValidToken");
+		final ReceiverBeacon receiver_beacon = (ReceiverBeacon) parser.parse(validAprs + " notAValidToken");
 		Assert.assertNull(receiver_beacon);
 	}
 
 	@Test
 	public void test_v021() {
-		ReceiverBeacon receiver_beacon = (ReceiverBeacon) parser
+		final ReceiverBeacon receiver_beacon = (ReceiverBeacon) parser
 				.parse(validAprs + " v0.2.1 CPU:0.8 RAM:25.6/458.9MB NTP:0.1ms/+2.3ppm +51.9C RF:+26-1.4ppm/-0.25dB");
 		Assert.assertEquals("0.2.1", receiver_beacon.getVersion());
 		Assert.assertEquals(0.8, receiver_beacon.getCpuLoad(), 0.01);
@@ -68,7 +68,7 @@ public class AprsReceiverBeaconTest {
 
 	@Test
 	public void test_v022() {
-		ReceiverBeacon receiver_beacon = (ReceiverBeacon) parser
+		final ReceiverBeacon receiver_beacon = (ReceiverBeacon) parser
 				.parse(validAprs + " v0.2.2.x86 CPU:0.5 RAM:669.9/887.7MB NTP:1.0ms/+6.2ppm +52.0C RF:+0.06dB");
 		Assert.assertEquals("x86", receiver_beacon.getPlatform());
 	}
@@ -96,7 +96,7 @@ public class AprsReceiverBeaconTest {
 
 	@Test
 	public void test_v026() {
-		ReceiverBeacon receiver_beacon = (ReceiverBeacon) parser.parse(validAprs);
+		final ReceiverBeacon receiver_beacon = (ReceiverBeacon) parser.parse(validAprs);
 		Assert.assertNotNull(receiver_beacon);
 
 		// Test default values

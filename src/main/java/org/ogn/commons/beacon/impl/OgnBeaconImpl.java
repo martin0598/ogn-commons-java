@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 OGN, All Rights Reserved.
+ * Copyright (c) 2014-2018 OGN, All Rights Reserved.
  */
 
 package org.ogn.commons.beacon.impl;
@@ -43,18 +43,6 @@ public class OgnBeaconImpl implements OgnBeacon, Serializable {
 	protected String rawPacket;
 
 	protected OgnBeaconImpl() {
-	}
-
-	public OgnBeaconImpl(String rawPacket, String id, long timestamp, double latitude, double longitude, float altitude,
-			int track, float groundSpeed) {
-		this.rawPacket = rawPacket;
-		this.id = id;
-		this.timestamp = timestamp;
-		this.lat = latitude;
-		this.lon = longitude;
-		this.alt = altitude;
-		this.track = track;
-		this.groundSpeed = groundSpeed;
 	}
 
 	public OgnBeaconImpl(Matcher matcher) {
@@ -160,7 +148,7 @@ public class OgnBeaconImpl implements OgnBeacon, Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		OgnBeaconImpl other = (OgnBeaconImpl) obj;
+		final OgnBeaconImpl other = (OgnBeaconImpl) obj;
 		if (Float.floatToIntBits(alt) != Float.floatToIntBits(other.alt))
 			return false;
 		if (id == null) {

@@ -42,6 +42,8 @@ public class IgcUrlCache {
 	private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
 	private final String url;
+	private final String igcFileUrlHostPort;
+
 	private final int refreshRate;
 
 	// cache
@@ -60,12 +62,33 @@ public class IgcUrlCache {
 	// ........|-id2 -> file_url
 	// ........|-idx -> file_url
 
+	public static String replaceIgcFileUrlHostAndPort(String link, String newHostPort) {
+		final Pattern patt = Pattern.compile("^http://(.+)/.+/\\d{4}-\\d{2}-\\d{2}/.*IGC$");
+		final Matcher m = patt.matcher(link);
+
+		while (m.find()) {
+			final String text = m.group(1);
+			return link.replace(text, newHostPort);
+		}
+
+		return link;
+	}
+
 	public IgcUrlCache(final String baseUrl) {
-		this(baseUrl, 5 * 60); // default: 5 min
+		this(baseUrl, null, 5 * 60); // default: 5 min
+	}
+
+	public IgcUrlCache(final String baseUrl, final String igcFileUrlHostPort) {
+		this(baseUrl, igcFileUrlHostPort, 5 * 60); // default: 5 min
 	}
 
 	public IgcUrlCache(final String baseUrl, int refreshRateInSec) {
+		this(baseUrl, null, refreshRateInSec); // default: 5 min
+	}
+
+	public IgcUrlCache(final String baseUrl, String igcFileUrlHostPort, int refreshRateInSec) {
 		this.url = baseUrl;
+		this.igcFileUrlHostPort = igcFileUrlHostPort;
 		this.refreshRate = refreshRateInSec;
 		executor.scheduleAtFixedRate(this::reload, 0, this.refreshRate, TimeUnit.SECONDS);
 	}
@@ -105,15 +128,23 @@ public class IgcUrlCache {
 			try {
 				doc = Jsoup.connect(link.absUrl("href")).get();
 				final Elements links2 = doc.select("a[href$=.IGC]");
-				for (final Element link2 : links2) {
+				for (final Element lnk : links2) {
+					// LOG.info("before: " + lnk.absUrl("href"));
+
+					String furl = lnk.absUrl("href");
+					if (null != igcFileUrlHostPort)
+						furl = replaceIgcFileUrlHostAndPort(lnk.absUrl("href"), igcFileUrlHostPort);
+
 					if (LOG.isTraceEnabled())
-						LOG.trace(link2.absUrl("href"));
-					final Matcher m = pattern.matcher(link2.absUrl("href"));
+						LOG.trace(furl);
+					// LOG.info("after: " + lnk);
+
+					final Matcher m = pattern.matcher(furl);
 					if (m.matches()) {
 						if (LOG.isTraceEnabled())
 							LOG.trace("date: {} id: {}", m.group("date"), m.group("id"));
 						cache.putIfAbsent(m.group("date"), new HashMap<>());
-						cache.get(m.group("date")).putIfAbsent(m.group("id"), link2.absUrl("href"));
+						cache.get(m.group("date")).putIfAbsent(m.group("id"), furl);
 					}
 
 				}

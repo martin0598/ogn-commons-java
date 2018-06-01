@@ -33,9 +33,9 @@ public class AprsUtilsTest {
 			clientId = AprsUtils.generateClientId();
 
 			int n = -1;
-			String suffix = null;
+			final String suffix = null;
 			try {
-				String[] tokens = clientId.split("-");
+				final String[] tokens = clientId.split("-");
 				assertEquals(2, tokens.length);
 
 				n = Integer.parseInt(tokens[1], 16);
@@ -43,12 +43,19 @@ public class AprsUtilsTest {
 					assertNotEquals(last, n);
 				}
 				last = n;
-			} catch (NumberFormatException ex) {
+			} catch (final NumberFormatException ex) {
 				fail("could not convert suffix: " + suffix + " to integer");
 			}
 
 		}
 
+	}
+
+	@Test
+	public void generatePassTest() throws Exception {
+		assertEquals(-1, AprsUtils.generatePass("EPZR"));
+		assertEquals(-1, AprsUtils.generatePass("MyStation"));
+		assertEquals(-1, AprsUtils.generatePass("AB-C01"));
 	}
 
 	@Test
@@ -58,8 +65,8 @@ public class AprsUtilsTest {
 
 	@Test
 	public void testDegToDms() {
-		double lat = 51.179500000000004;
-		double lon = -1.0328333333333335;
+		final double lat = 51.179500000000004;
+		final double lon = -1.0328333333333335;
 		assertEquals(51.1077f, AprsUtils.degToDms(lat), 0.01f);
 		assertEquals(1.0197f, AprsUtils.degToDms(lon), 0.01f);
 		assertEquals(lat, AprsUtils.dmsToDeg(AprsUtils.degToDms(lat)), 1e-10f);
@@ -67,8 +74,8 @@ public class AprsUtilsTest {
 
 	@Test
 	public void testDegToIgc() {
-		double lat = 51.179500000000004;
-		double lon = -1.0328333333333335;
+		final double lat = 51.179500000000004;
+		final double lon = -1.0328333333333335;
 
 		assertEquals("5110770N", AprsUtils.degToIgc(lat, Coordinate.LAT));
 		assertEquals("00101970W", AprsUtils.degToIgc(lon, Coordinate.LON));
@@ -77,13 +84,13 @@ public class AprsUtilsTest {
 	@Test
 	public void testToUtcTimestamp() {
 		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-		Date d = new Date();
+		final Date d = new Date();
 		cal.setTime(d);
 
 		long timestamp = d.getTime();
-		int h = cal.get(Calendar.HOUR_OF_DAY);
-		int m = cal.get(Calendar.MINUTE);
-		int s = cal.get(Calendar.SECOND);
+		final int h = cal.get(Calendar.HOUR_OF_DAY);
+		final int m = cal.get(Calendar.MINUTE);
+		final int s = cal.get(Calendar.SECOND);
 
 		long t = AprsUtils.toUtcTimestamp(h, m, s);
 		assertTrue(t - timestamp <= 100);
@@ -112,8 +119,8 @@ public class AprsUtilsTest {
 		assertEquals(0, t - timestamp);
 		assertTrue(t % 1000 == 0);
 
-		LocalDate date = LocalDate.of(2016, 10, 5);
-		LocalTime time = LocalTime.of(11, 12, 33);
+		final LocalDate date = LocalDate.of(2016, 10, 5);
+		final LocalTime time = LocalTime.of(11, 12, 33);
 		t = AprsUtils.toUtcTimestamp(date, time.getHour(), time.getMinute(), time.getSecond());
 		// the timestamp should be rounded to a sec
 		assertTrue(t % 1000 == 0);
@@ -123,12 +130,12 @@ public class AprsUtilsTest {
 	public void testDistance() {
 
 		double lat1 = 43.04283f;
-		double lon1 = 0.55f;
+		final double lon1 = 0.55f;
 
-		double lat2 = 43.466f;
+		final double lat2 = 43.466f;
 		double lon2 = 0.72f;
 
-		long distMetres = Math.round(AprsUtils.calcDistance(lat1, lon1, lat2, lon2));
+		final long distMetres = Math.round(AprsUtils.calcDistance(lat1, lon1, lat2, lon2));
 		assertEquals(49027, distMetres);
 
 		double distKm = AprsUtils.calcDistanceInKm(lat1, lon1, lat2, lon2);

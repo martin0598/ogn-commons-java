@@ -11,17 +11,21 @@ import static java.lang.Math.sin;
 import static java.lang.String.format;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Random;
 import java.util.UUID;
 
 import org.ogn.commons.beacon.OgnBeacon;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AprsUtils {
+
+	private static final Logger LOG = LoggerFactory.getLogger(AprsUtils.class);
 
 	private static final int RADIUS = 6371000;
 
@@ -58,16 +62,25 @@ public class AprsUtils {
 	 */
 	public static String generateClientId() {
 		try {
+
 			final String suffix = UUID.randomUUID().toString().split("-")[3].toUpperCase();
-			final String res = InetAddress.getLocalHost().getHostName().substring(0, 3).toUpperCase();
+			final String hostName = InetAddress.getLocalHost().getHostName();
+			final String res = (hostName.length() > 3 ? hostName.substring(0, 3) : hostName).toUpperCase();
 			final StringBuilder bld = new StringBuilder(res.replace("-", ""));
 			bld.append("-");
 			bld.append(suffix);
 
 			return bld.toString();
-		} catch (final UnknownHostException e) {
-			return null;
+		} catch (final Exception e) {
+			final String fallbackClientId = "CLI" + new Random(System.currentTimeMillis()).nextInt(100);
+			LOG.warn("clientId generation failed, returning fallback id: {}", fallbackClientId, e);
+			return fallbackClientId;
 		}
+	}
+
+	// calc. password for the APRS server login
+	public static int generatePass(String callSign) {
+		return -1;
 	}
 
 	public static double dmsToDeg(double dms) {

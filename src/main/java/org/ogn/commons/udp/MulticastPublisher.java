@@ -42,7 +42,7 @@ public class MulticastPublisher {
 			socket.send(pack);
 		} catch (final Exception ex) {
 			LOG.error("failed while trying to send packet (size: {}) to multicast group: {} on port: {}", msg.length,
-					group, port);
+					group, port, ex);
 		}
 	}
 

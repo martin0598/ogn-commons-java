@@ -118,6 +118,8 @@ public class IgcUrlCache {
 		final Elements links = doc.select("a[href~=(\\d{4}-\\d{2}-\\d{2})");
 
 		writeLock.lock();
+		cache.clear();
+
 		for (final Element link : links) {
 			if (LOG.isTraceEnabled()) {
 				LOG.trace("*******************");
